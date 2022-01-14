@@ -1,0 +1,347 @@
+body {
+    padding: 0;
+    margin: 0;
+}
+html, body, #map {
+    height: 100%;
+    width: 100%;
+}
+
+section {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-top: 2%; */
+}
+
+
+
+section .box {
+    display: block;
+    z-index: 5;
+    position: relative;
+    width: auto;
+    padding: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(5px);
+    color: #000;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+section .footer {
+    display: block;
+    z-index: 5;
+    position: fixed;
+    min-width: 50%;
+    bottom: 0;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(25px);
+    color: #000;
+    border-top-left-radius: 25px;
+    border-top-right-radius: 25px;
+}
+
+.upload {
+    
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 1%;
+}
+
+.upload-box {
+    display: none;
+    z-index: 5;
+    position: relative;
+    width: 80%;
+    height: 60%;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(5px);
+    color: #000;
+    border-radius: 15px;
+   
+}
+
+.login {
+    
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.login-box {
+
+    display: none;
+    z-index: 5;
+    position: relative;
+    width: 40%;
+    height: 60%;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(5px);
+    color: #000;
+    border-radius: 15px;
+}
+
+.add {
+    
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 0;
+}
+
+.add-box {
+
+    display: none;
+    z-index: 5;
+    position: relative;
+    content: " ";
+    min-width: 80%;
+    min-height: 81vh;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(5px);
+    color: #000;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.add-photo-item1 { grid-area: gps; }
+.add-photo-item2 { grid-area: file; }
+.add-photo-item3 { grid-area: camera; }
+.add-photo-item4 { grid-area: lens; }
+.add-photo-item5 { grid-area: iso; }
+.add-photo-item6 { grid-area: shutter; }
+.add-photo-item7 { grid-area: fstop; }
+.add-photo-item8 { grid-area: cat; }
+
+.add-photo-item9 { grid-area: info; }
+.add-photo-item10 { grid-area: add; }
+.add-photo-item11 { grid-area: title; }
+.add-photo-item12 { grid-area: location; }
+.add-photo-item13 { grid-area: button; }
+
+.add-photo-grid-container {
+  display: grid;
+  min-height: 80vh;
+  margin-top: 10px;
+  grid-template-rows:  75px 75px 75px 75px auto 75px ;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-areas:
+  	'title title title title'
+    'gps gps camera lens'
+    'gps gps shutter fstop'
+    'gps gps iso cat'
+    'gps gps info info'
+    'location location add button';
+  grid-gap: 3px;
+  /* background-color: #2195f328; */
+  padding: 10px;
+}
+
+.add-photo-grid-container > div {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  text-align: center;
+  padding: 5px 0;
+  font-size: 30px;
+  border: 2px solid black;
+  border-radius: 10px;
+}
+
+.add-image {
+    background-color: black;
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+.add-inputs {
+    height: 35px;
+    font-size: 28px;
+    margin: 10px;
+    width: 265px;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.title {
+   width: 80%; 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#map{
+    position: relative;
+    
+}
+
+.btn {
+background-color: white;
+border-radius: 18px;
+height: 50px;
+width: 210px;
+margin-top: 5px;
+font-size: 20px;
+}
+
+.btn:hover {
+    background-color: #44790756;
+    color: white;
+}
+
+.btn-small {
+    width: 100px;
+    margin-left: 15px;
+}
+
+
+
+
+
+
+.login-boxes {
+    margin: 10px;
+    padding: 0;
+    display: block;
+    height: 40px;
+    width: 95%;
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+}
+
+
+.item1 { grid-area: header; }
+.item2 { grid-area: login; }
+.item3 { grid-area: divider; }
+.item4 { grid-area: signup; }
+
+
+.login-grid-container {
+  display: grid;
+  z-index: 5;
+  grid-template-columns: 1fr 1fr 5px 1fr 1fr;
+  grid-template-areas:
+    'header header  header header header'
+    'login login  divider signup signup';
+  grid-gap: 10px;
+  /* background-color: #2196F3; */
+  padding: 10px;
+}
+
+.login-grid-container > div {
+z-index: 5;
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+
+
+.view-photo {
+    position: relative;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    margin-top: -35px;
+}
+
+.view-box {
+    display: block;
+    z-index: 5;
+    position: relative;
+    width: 95%;
+    min-height: 80vh;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(50px);
+    color: #000;
+    border-radius: 15px;
+}
+
+
+.photo { grid-area: photo; }
+.camera { grid-area: camera; }
+.info{ grid-area: info; }
+
+.photo-grid-container {
+  display: grid;
+  height: 78vh;
+    width: 99%;
+  grid-template-areas:
+    'photo info '
+    'photo info'
+    'photo info';
+  grid-gap: 10px;
+  grid-template-columns: 5fr 2fr;
+  grid-template-rows: 1fr 5fr;
+  /* background-color: #2196F3; */
+  padding: 10px;
+  margin-top: 60px;
+  
+}
+
+.photo-grid-container > div {
+  /* background-color: rgba(255, 255, 255, 0.8); */
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+.photo {
+    background-image: url('');
+    background-position: center;
+    background-size: 100%;
+    background-repeat: no-repeat;
+}
+
+h1 {
+    font-size: 28px;
+    font-weight: 200;
+    text-decoration: underline;
+}
+
+#info {
+    font-size: 18px;
+    font-weight: 100;
+}
+
+.photo-btn {
+    height: 55px;
+    width: 55px;
+}
+

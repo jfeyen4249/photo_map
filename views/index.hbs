@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>PhotoMap - A photographers guide</title>
+    <script src="/leaflet.js"></script>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/leaflet.css"/>
+    <link rel="stylesheet" href="/main.css"/>
+    <script defer src="/script.js"></script>
+    <!-- <link rel="stylesheet" href="path/to/font-awesome/css/font-awesome.min.css"> -->  
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    
+</head>
+<body>
+    <div id="map">
+        <section>
+            <div class="box" id="box">
+                <button class="btn" id="add" onclick="addphotosopen();"><i class="fa fa-plus-circle"></i> Add Photo</button>
+                <button class="btn" id="myphotos" onclick="myphotos();"><i class="fa fa-camera-retro"></i> My Photos</button>
+                <button class="btn" id="myfavs" onclick="myfavs();"><i class="fa fa-heart"></i> My Favorites</button>
+                <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button>
+                <button class="btn" onclick="openloginbox();" id="login"><i class="fa fa-user"></i> Login/Sign Up</button>
+                <button class="btn" onclick="test();" id="about"><i class="fa fa-address-card"></i> About Photo Map</button>
+            </div>
+
+            <div class="footer" id="footer">
+                <h1>Zoom in to see photos on the map</h1>
+            </div>
+            </section>
+
+        <div class="add">
+            <div class="add-box">
+                <div class="add-photo-grid-container">
+                    <div  class="add-photo-item11"><input id="title" placeholder="Photo Title" id="title" class="add-inputs title"></div>
+                    <div id="image" class="add-photo-item1 add-image"></div>
+                    <div id="camera" class="add-photo-item3"><input placeholder="Camera" class="add-inputs"></div>  
+                    <div id="lens" class="add-photo-item4"><input placeholder="Lens" class="add-inputs"></div>
+                    <div id="shutter" class="add-photo-item5"><input placeholder="Shutter Speed" class="add-inputs"></div>
+                    <div id="iso" class="add-photo-item6"><input placeholder="ISO" class="add-inputs"></div>
+                    <div class="add-photo-item7"><input placeholder="fstop" class="add-inputs"></div>
+                    <div class="add-photo-item8">Category</div>
+                    <div class="add-photo-item9">info</div>
+                    <div id="addfile" class="add-photo-item10"><input id='files' type="file" accept="image/jpeg" onchange="disableupload()"></div>
+                    <div id="latlng" class="add-photo-item12"><input type="text" placeholder="Lat" id="Lat" class="add-inputs"><input type="text" placeholder="Long" id="lng" class="add-inputs"><button class="btn btn-small">Select</button></div>
+                    <div class="add-photo-item13"><button class="btn btn-small">Save</button><button class="btn btn-small" onclick="addphotosclose();">Cancel</button></div>
+                  </div>
+            </div>
+        </div>
+
+        <div class="view-photo">
+            <div class="view-box">
+                <div class="photo-grid-container">
+                    <div class="photo"></div>
+                    
+                    <div class="info"> <h1 id="pic-title"></h1> <br> <p id="info"></p> <br>
+                    <button class="photo-btn" onclick="closePhoto()">Close</button>
+                    </div>  
+                    
+                  </div> 
+            </div>
+        </div>
+
+        <div class="login">
+            <div class="login-box">
+                <div class="login-grid-container">
+                    <div class="item1">Sign up or log into your Account</div>
+                    <div class="item2">
+                        <center>
+                            <br>
+                        Login
+                        <form action="/login" method="post">
+                        <input name="username" placeholder="Email Address" class="login-boxes">
+                        <input name="password" placeholder="Password" class="login-boxes" type="password">
+                        <button class="btn"><i class="fa fa-key"></i> Login</button>
+                        <button class="btn" type="submit"><i class="fa fa-key"></i> Cancel</button>
+                        </form>
+                        </center>
+                        
+
+                    </div>
+                    <div class="item3"><hr width="1" size="300"></div>  
+                    <div class="item4">
+                        <center>
+                        Sign up
+                       <form action="/register" method="post">
+                        <input name="email" placeholder="Email Address" class="login-boxes">
+                        <input name="newusername"  placeholder="Select a Username" class="login-boxes">
+                        <input name="newpassword" placeholder="Password" class="login-boxes" type="password">
+                        <input name="newpassword1" placeholder="Re-Enter Password" class="login-boxes" type="password">
+                        <input name="fname" placeholder="First Name" class="login-boxes">
+                        <input name="lname" placeholder="Last Name" class="login-boxes">
+                        <button id="sign-up" class="btn" type="submit"><i class="fa fa-user-plus"></i> Sign Up</button>
+                        </form>
+                    </center>
+                    </div>
+                  </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
