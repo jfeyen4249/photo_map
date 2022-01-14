@@ -127,23 +127,7 @@ function loadMarkers() {
         });
     } else {
         //The user is told to zoom in if the radius is more that 600
-        // document.getElementsByClassName('footer')[0].style.display = "block";
-        // if(zoomlevel == 5 || zoomlevel == 6 || zoomlevel == 7) {
-        //     document.getElementsByClassName('footer')[0].style.display = "none";
-        //     let MyURL = `/radius?lat=${map.getCenter().lat}&lng=${map.getCenter().lng}&radius=${Math.floor(mapRadius)}`
-        //     fetch(MyURL)
-        //     .then(response => response.json())
-        //     .then(data => {
-        //         for(var i = 0; i < data.length; i++) {
-        //             var obj = data[i];
-        //             var marker, test;
-        //             test = obj.id;
-        //             marker = L.marker([obj.lat, obj.lng], markerOptions).addTo(myFeatureGroup).bindPopup("");
-        //             marker.test = test;
-        //         }
-        //     });
-
-        // }
+         document.getElementsByClassName('footer')[0].style.display = "block";
     }
 } 
 

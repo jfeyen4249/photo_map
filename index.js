@@ -13,7 +13,7 @@ const jwt = require('jsonwebtoken')
 const async = require('hbs/lib/async');
 const { nextTick } = require('process');
 dotenv.config({ path: './.env'});
-const port = 80
+const port = 443
 
 const config = {
   // Default type of number
