@@ -6,13 +6,16 @@
 
 
 var zoomLock = false;                               //map lock for on.map drag and zoom functions
-const buttonBox = document.getElementById('box')    //Menubar box
-let uploadbox = document.getElementById("addfile")
-let latlng = document.getElementById("latlng")
-let title = document.getElementById("title")
-let uploadfile = document.getElementById('files')
-
-
+const buttonBox = document.getElementById('box') ;   //Menubar box
+const addBox = document.getElementById('GPSselect') ;
+let uploadbox = document.getElementById("addfile");
+let latlng = document.getElementById("latlng");
+let title = document.getElementById("title");
+let uploadfile = document.getElementById('files');
+let markerSet = false;
+const myHeaders = new Headers();
+myHeaders.append('Content-Type', 'application/json');
+myHeaders.append('Authorization', `Bearer ${sessionStorage.getItem('token')}`);
 
 // ****************************************
 // ****************************************
@@ -27,9 +30,7 @@ L.tileLayer(
     maxZoom: 18,
     noWrap: true
     }).addTo(map);
-    L.control.zoom({
-        position:'bottomright'
-    }).addTo(map);
+    
     var iconOptions = {
         iconUrl: 'icon.png',
         iconSize: [50, 50]
@@ -45,8 +46,6 @@ L.tileLayer(
      }
     var myFeatureGroup = L.featureGroup().addTo(map).on("click", groupClick);
 
-
-
 // ****************************************
 // ****************************************
 // ****       Map.on functions         ****
@@ -55,21 +54,31 @@ L.tileLayer(
 
 // Prevents map from loading markers when there is not a logged in user.
 map.on('dragend', function(ev) {
-    if(localStorage.getItem('username') !== null){
+    if(sessionStorage.getItem('username') !== null){
         loadMarkers();
     }
 });
 // Prevents map from loading markers when there is not a logged in user.
 map.on('zoomend', function(ev) {
-    if(localStorage.getItem('username') !== null){
+    if(sessionStorage.getItem('username') !== null){
         loadMarkers();
         console.log(map.getZoom())
     }
 });
 // Logs where a user clicked on the map.
-// map.on('click', function(ev) {
-//     console.log("You clicked the map at Lat:" + ev.latlng.lat.toString() +" and Lng: " + ev.latlng.lng.toString());
-// });
+map.on('click', function(ev) {
+    const mapLat = ev.latlng.lat.toString()
+    const mapLng = ev.latlng.lng.toString()
+    if(markerSet == true) {
+        const setLat = mapLat;
+        const setLng = mapLng;
+        console.log(setLat + " | " + setLng)
+        document.getElementById('lat').innerText= setLat
+        document.getElementById('lng').innerText= setLng
+        document.getElementsByClassName('add-box')[0].style.display = "block";
+        markerSet = false;
+    }
+});
 
 // Prevents map from being dragged when hovering over the top buttons
 buttonBox.addEventListener('mouseover', () => {
@@ -79,9 +88,8 @@ buttonBox.addEventListener('mouseover', () => {
 // Prevents map from being dragged when hovering over the top buttons
 buttonBox.addEventListener('mouseleave', () => {
     zoomLock = false
-    map.on("zoomstart", function(e) {if(zoomLock){throw 'zoom disabled';}});
+    map.on("dreagend", function(e) {if(zoomLock){throw 'zoom disabled';}});
 })
-
 
 
 // ****************************************
@@ -107,13 +115,14 @@ function loadMarkers() {
     //Markers get cleared before fetching the new markers
     myFeatureGroup.clearLayers();
     //The radius of the current view is calculated 
+
     let mapRadius = getDistance(map.getCenter().lat, map.getCenter().lng, map.getCenter().lat, map.getBounds().getEast().toString());
     // The makers are loaded if the radius is less than 600
     let zoomlevel = map.getZoom();
     if(mapRadius <= 600) {
         document.getElementsByClassName('footer')[0].style.display = "none";
         let MyURL = `/radius?lat=${map.getCenter().lat}&lng=${map.getCenter().lng}&radius=${Math.floor(mapRadius)}`
-        fetch(MyURL)
+        fetch(MyURL, {headers: myHeaders})
         .then(response => response.json())
         .then(data => {
             for(var i = 0; i < data.length; i++) {
@@ -123,15 +132,12 @@ function loadMarkers() {
                 marker = L.marker([obj.lat, obj.lng], markerOptions).addTo(myFeatureGroup).bindPopup("");
                 marker.test = test;
             }
-            
         });
     } else {
         //The user is told to zoom in if the radius is more that 600
          document.getElementsByClassName('footer')[0].style.display = "block";
     }
 } 
-
-
 
 // ****************************************
 // ****************************************
@@ -144,7 +150,7 @@ function groupClick(event) {
     // The top menu bar is hidden.
     document.getElementsByClassName('box')[0].style.display = "none";
     // The derails are fetched and displayed to the user.
-    fetch(`/info?id=${event.layer.test}`)
+    fetch(`/info?id=${event.layer.test}`, {headers: myHeaders})
     .then(response => response.json())
     .then(data => {
         console.log(data[0].id);
@@ -164,7 +170,6 @@ function closePhoto() {
 }
 
 
-
 // ****************************************
 // ****************************************
 // ****      Security Functions        ****
@@ -172,23 +177,50 @@ function closePhoto() {
 // ****************************************
 
 // Checking for a User's session 
-if(localStorage.getItem('username') == null) {
-    document.getElementById("add").style.display = "none";
-    document.getElementById("myphotos").style.display = "none";
-    document.getElementById("myfavs").style.display = "none";
-    document.getElementById("search").style.display = "none";
-    zoomLock = false;
-    document.getElementsByClassName('footer')[0].style.display = "none";
-} else 
-    loadMarkers();
-    function openloginbox() {
+if(sessionStorage.getItem('username') == null) {
     document.getElementsByClassName('login-box')[0].style.display = "block";
     document.getElementsByClassName('box')[0].style.display = "none";
-}
-
-function closeloginbox() {
+    document.getElementsByClassName('footer')[0].style.display = "none";
+} else {
+    loadMarkers();
     document.getElementsByClassName('login-box')[0].style.display = "none";
     document.getElementsByClassName('box')[0].style.display = "block";
+}
+
+// ****************************************
+// ****************************************
+// ****      Security Functions        ****
+// ****************************************
+// ****************************************
+
+async function login() {
+    // const formData = new FormData();
+    // formData.append("Content-Type", "application/json")
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    let data = JSON.stringify({username: username, password: password})
+
+    fetch("/login", {
+        method: 'POST',
+        body: data,
+        headers: {'Content-Type': 'application/json;charset=utf-8'}
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.status == "pass"){
+            sessionStorage.setItem('username', data.username);
+            sessionStorage.setItem('token', data.token);
+            window.location.reload();
+        } else {
+            alert("Incorrect username or password!");
+        }
+     });
+}
+
+function logout() {
+    sessionStorage.removeItem("username");
+    sessionStorage.removeItem("token");
+    window.location.reload();
 }
 
 
@@ -217,23 +249,6 @@ function signup() {
 }
 
 
-async function test() {
-const myHeaders = new Headers();
-
-myHeaders.append('Content-Type', 'application/json');
-myHeaders.append('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoiamZleWVuIiwiaWF0IjoxNjQyMTA4ODMzfQ.-YJqEzskQKR2poFtJ7VUa-CI7NR13LxVfqzdWsWrBy4');
-
-return fetch('/test', {
-  method: 'POST',
-  headers: myHeaders,
-})
-.then(response => response.text())
-.then(data => {
-    console.log(data);
-});
-
-}
-
 // ****************************************
 // ****************************************
 // ****    Adding a photo functions    ****
@@ -244,6 +259,7 @@ function addphotosopen() {
     document.getElementsByClassName('add-box')[0].style.display = "block";
     document.getElementsByClassName('box')[0].style.display = "none";
     uploadbox.style.backgroundColor = "red"
+    LoadAddCat()
 }
 
 function addphotosclose() {
@@ -268,11 +284,26 @@ async function disableupload() {
         document.getElementById("camera").setAttribute('value', data.camera);
         document.getElementById("iso").value = data.ISO
      });
-     latlgnselected()
 }
 
-function latlgnselected() {
-    uploadfile.disabled = true
-    latlng.style.backgroundColor = "transparent"
-    title.style.backgroundColor = "red"
+function setMapMarker() { 
+    document.getElementsByClassName('add-box')[0].style.display = "none";
+    window.setTimeout (markerSet == true, 3)
+}
+
+async function LoadAddCat() {
+    var select = document.getElementById("cat");
+    select.options[select.options.length] = new Option("Select a Category", "Select a Category")
+    return fetch('/cat', {
+        method: 'GET',
+        headers: myHeaders,
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data);
+         for(let i = 0; i < data.length; i++) {
+            let obj = data[i]
+            select.options[select.options.length] = new Option(obj.category, obj.category);
+         }  
+      });
 }

@@ -187,7 +187,9 @@ section .footer {
    width: 80%; 
 }
 
-
+#GPSselect {
+    z-index: 6;
+}
 
 
 

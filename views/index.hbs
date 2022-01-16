@@ -19,8 +19,9 @@
                 <button class="btn" id="myphotos" onclick="myphotos();"><i class="fa fa-camera-retro"></i> My Photos</button>
                 <button class="btn" id="myfavs" onclick="myfavs();"><i class="fa fa-heart"></i> My Favorites</button>
                 <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button>
-                <button class="btn" onclick="openloginbox();" id="login"><i class="fa fa-user"></i> Login/Sign Up</button>
-                <button class="btn" onclick="test();" id="about"><i class="fa fa-address-card"></i> About Photo Map</button>
+                <button class="btn" onclick="openloginbox();" id="top"><i class="fa fa-user"></i> Top 50</button>
+                <button class="btn" id="about"><i class="fa fa-address-card"></i> About Photo Map</button>
+                <button class="btn" onclick="logout();" id="logout"><i class="fa fa-user"></i> Logout</button>
             </div>
 
             <div class="footer" id="footer">
@@ -38,10 +39,10 @@
                     <div id="shutter" class="add-photo-item5"><input placeholder="Shutter Speed" class="add-inputs"></div>
                     <div id="iso" class="add-photo-item6"><input placeholder="ISO" class="add-inputs"></div>
                     <div class="add-photo-item7"><input placeholder="fstop" class="add-inputs"></div>
-                    <div class="add-photo-item8">Category</div>
+                    <div class="add-photo-item8"><select id="cat"></select></div>
                     <div class="add-photo-item9">info</div>
                     <div id="addfile" class="add-photo-item10"><input id='files' type="file" accept="image/jpeg" onchange="disableupload()"></div>
-                    <div id="latlng" class="add-photo-item12"><input type="text" placeholder="Lat" id="Lat" class="add-inputs"><input type="text" placeholder="Long" id="lng" class="add-inputs"><button class="btn btn-small">Select</button></div>
+                    <div id="latlng" class="add-photo-item12"><p class="lat" id="lat"></p> <p class="lng" id="lng"></p><button onclick="setMapMarker();" id="GPSselect" class="btn btn-small">Select</button></div>
                     <div class="add-photo-item13"><button class="btn btn-small">Save</button><button class="btn btn-small" onclick="addphotosclose();">Cancel</button></div>
                   </div>
             </div>
@@ -68,15 +69,10 @@
                         <center>
                             <br>
                         Login
-                        <form action="/login" method="post">
-                        <input name="username" placeholder="Email Address" class="login-boxes">
-                        <input name="password" placeholder="Password" class="login-boxes" type="password">
-                        <button class="btn"><i class="fa fa-key"></i> Login</button>
-                        <button class="btn" type="submit"><i class="fa fa-key"></i> Cancel</button>
-                        </form>
+                        <input name="username" id="username" placeholder="username" class="login-boxes">
+                        <input name="password" id="password" placeholder="Password" class="login-boxes" type="password">
+                        <button class="btn" onclick="login();"><i class="fa fa-key"></i> Login</button>
                         </center>
-                        
-
                     </div>
                     <div class="item3"><hr width="1" size="300"></div>  
                     <div class="item4">
