@@ -7,12 +7,22 @@
 
 var zoomLock = false;                               //map lock for on.map drag and zoom functions
 const buttonBox = document.getElementById('box') ;   //Menubar box
-const addBox = document.getElementById('GPSselect') ;
+const gpsbutton = document.getElementById('footer-btn') ;
 let uploadbox = document.getElementById("addfile");
 let latlng = document.getElementById("latlng");
-let title = document.getElementById("title");
+let title = document.getElementById("titlebox");
+let camera = document.getElementById("camera");
+let lens = document.getElementById("lens");
+let shutter = document.getElementById("shutter");
+let iso = document.getElementById("iso");
+let fstop = document.getElementById("fstop");
+let cat = document.getElementById("cat");
+let info = document.getElementById("infobox");
+
+
 let uploadfile = document.getElementById('files');
-let markerSet = false;
+var addPic = {lat: "", lng: ""}
+var setLocation = false
 const myHeaders = new Headers();
 myHeaders.append('Content-Type', 'application/json');
 myHeaders.append('Authorization', `Bearer ${sessionStorage.getItem('token')}`);
@@ -33,7 +43,8 @@ L.tileLayer(
     
     var iconOptions = {
         iconUrl: 'icon.png',
-        iconSize: [50, 50]
+        iconSize: [50, 50],
+        iconAnchor: [25, 25],
      }
      // Creating a custom icon
      var customIcon = L.icon(iconOptions);
@@ -46,6 +57,7 @@ L.tileLayer(
      }
     var myFeatureGroup = L.featureGroup().addTo(map).on("click", groupClick);
 
+
 // ****************************************
 // ****************************************
 // ****       Map.on functions         ****
@@ -54,13 +66,13 @@ L.tileLayer(
 
 // Prevents map from loading markers when there is not a logged in user.
 map.on('dragend', function(ev) {
-    if(sessionStorage.getItem('username') !== null){
+    if(sessionStorage.getItem('username') !== null && setLocation == false){
         loadMarkers();
     }
 });
 // Prevents map from loading markers when there is not a logged in user.
 map.on('zoomend', function(ev) {
-    if(sessionStorage.getItem('username') !== null){
+    if(sessionStorage.getItem('username') !== null && setLocation == false){
         loadMarkers();
         console.log(map.getZoom())
     }
@@ -69,14 +81,12 @@ map.on('zoomend', function(ev) {
 map.on('click', function(ev) {
     const mapLat = ev.latlng.lat.toString()
     const mapLng = ev.latlng.lng.toString()
-    if(markerSet == true) {
-        const setLat = mapLat;
-        const setLng = mapLng;
-        console.log(setLat + " | " + setLng)
-        document.getElementById('lat').innerText= setLat
-        document.getElementById('lng').innerText= setLng
-        document.getElementsByClassName('add-box')[0].style.display = "block";
-        markerSet = false;
+    addPic.lat = mapLat.substring(0, 9)
+    addPic.lng = mapLng.substring(0, 9)
+    if(setLocation == true) {
+        myFeatureGroup.clearLayers();
+        L.marker([mapLat.substring(0, 9), mapLng.substring(0, 9)], markerOptions).addTo(myFeatureGroup).bindPopup("")
+        console.log(`${mapLat.substring(0, 9)}, ${mapLng.substring(0, 9)}`)
     }
 });
 
@@ -89,6 +99,19 @@ buttonBox.addEventListener('mouseover', () => {
 buttonBox.addEventListener('mouseleave', () => {
     zoomLock = false
     map.on("dreagend", function(e) {if(zoomLock){throw 'zoom disabled';}});
+})
+
+gpsbutton.addEventListener('mouseover', () => {
+    zoomLock = true
+    map.on("zoomstart", function(e) {if(zoomLock){throw 'zoom disabled';}});
+    setLocation = false
+    
+})
+// Prevents map from being dragged when hovering over the top buttons
+gpsbutton.addEventListener('mouseleave', () => {
+    zoomLock = false
+    map.on("dreagstart", function(e) {if(zoomLock){throw 'zoom disabled';}});
+    setLocation = true
 })
 
 
@@ -119,7 +142,7 @@ function loadMarkers() {
     let mapRadius = getDistance(map.getCenter().lat, map.getCenter().lng, map.getCenter().lat, map.getBounds().getEast().toString());
     // The makers are loaded if the radius is less than 600
     let zoomlevel = map.getZoom();
-    if(mapRadius <= 600) {
+    if(mapRadius <= 600  && setLocation == false) {
         document.getElementsByClassName('footer')[0].style.display = "none";
         let MyURL = `/radius?lat=${map.getCenter().lat}&lng=${map.getCenter().lng}&radius=${Math.floor(mapRadius)}`
         fetch(MyURL, {headers: myHeaders})
@@ -223,8 +246,6 @@ function logout() {
     window.location.reload();
 }
 
-
-
 // ****************************************
 // ****************************************
 // ****       Button Functions         ****
@@ -265,10 +286,12 @@ function addphotosopen() {
 function addphotosclose() {
     document.getElementsByClassName('add-box')[0].style.display = "none";
     document.getElementsByClassName('box')[0].style.display = "block";
-    loadMarkers;
+    document.getElementById('likebutton').style.color = "black"
+    setLocation = false
+    loadMarkers();
 }
 
-async function disableupload() {
+async function uploadPic() {
     const formData = new FormData();
     formData.append("photo", files.files[0]);
     
@@ -278,21 +301,42 @@ async function disableupload() {
     })
     .then(response => response.json())
     .then(data => {
-        console.log(data);
+        sessionStorage.setItem("AddPic", data.image)
         document.getElementById('image').style.backgroundImage = `url(/img/${data.image})`
-        document.getElementById("camera").value = data.camera
-        document.getElementById("camera").setAttribute('value', data.camera);
-        document.getElementById("iso").value = data.ISO
+        uploadbox.style.backgroundColor = "green";
+        latlng.style.backgroundColor = "red"
      });
 }
 
 function setMapMarker() { 
-    document.getElementsByClassName('add-box')[0].style.display = "none";
-    window.setTimeout (markerSet == true, 3)
+    document.getElementsByClassName('add-box')[0].style.display = "none"
+    document.getElementById('footer-text').style.display = "none"
+    document.getElementById('footer-btn').style.display = "block"
+    document.getElementById('footer').style.display = "block"
+    setLocation = true
+}
+
+function saveMapMarker() {
+    document.getElementById('lat').innerText = addPic.lat;
+    document.getElementById('lng').innerText = addPic.lng;
+    document.getElementById('footer-text').style.display = "block"
+    document.getElementById('footer-btn').style.display = "none"
+    document.getElementById('footer-btn').style.display = "none"
+    document.getElementsByClassName('add-box')[0].style.display = "block"
+    latlng.style.backgroundColor = "green"
+    title.style.backgroundColor = "red"
+    camera.style.backgroundColor = "red"
+    lens.style.backgroundColor = "red"
+    shutter.style.backgroundColor = "red"
+    iso.style.backgroundColor = "red"
+    fstop.style.backgroundColor = "red"
+    cat.style.backgroundColor = "red"
+    info.style.backgroundColor = "red"
+    setLocation = false
 }
 
 async function LoadAddCat() {
-    var select = document.getElementById("cat");
+    var select = document.getElementById("catSelect");
     select.options[select.options.length] = new Option("Select a Category", "Select a Category")
     return fetch('/cat', {
         method: 'GET',
@@ -306,4 +350,44 @@ async function LoadAddCat() {
             select.options[select.options.length] = new Option(obj.category, obj.category);
          }  
       });
+}
+
+async function SaveImage() {
+    let data = JSON.stringify({
+        filename: sessionStorage.getItem('AddPic'), 
+        title: document.getElementById("title").value,
+        camera: document.getElementById("cameratext").value,
+        lens: document.getElementById("lenstext").value,
+        shutter: document.getElementById("shuttertext").value,
+        iso: document.getElementById("isotext").value,
+        fstop: document.getElementById("fstoptext").value,
+        category: document.getElementById("catSelect").value,
+        info: document.getElementById("infotext").value,
+        lat: addPic.lat,
+        lng: addPic.lng,
+        username: sessionStorage.getItem('username')
+    })
+
+    fetch("/picsave", {
+        method: 'POST',
+        body: data,
+        headers: myHeaders
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.message == "Saved"){ 
+            sessionStorage.removeItem('AddPic')
+            window.location.reload()
+        }else{
+            alert("Failed to save!")
+        }
+     });
+}
+
+function PicLike() {
+    if(document.getElementById('likebutton').style.color = "black") {
+        document.getElementById('likebutton').style.color = "red"
+    }else if(document.getElementById('likebutton').style.color = "red") {
+        document.getElementById('likebutton').style.color = "black"
+    }
 }

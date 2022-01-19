@@ -1,9 +1,6 @@
 const express = require('express')
 const mysql = require('mysql')
-const bodyParser = require('body-parser');
 const app = express()
-const { create, all } = require('mathjs')
-var ExifImage = require('exif').ExifImage;
 const multer = require("multer");
 const upload = multer({ dest: "./public/img" });
 const fs = require('fs');
@@ -11,18 +8,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken')
-const async = require('hbs/lib/async');
-const { nextTick } = require('process');
 dotenv.config({ path: './.env'});
 const port = 80
-
-const config = {
-  // Default type of number
-  // Available options: 'number' (default), 'BigNumber', or 'Fraction'
-  number: 'Fraction'
-}
-// create a mathjs instance with everything included
-const math = create(all, config);
 
 var connection = mysql.createConnection({
     host     : process.env.db_host,
@@ -30,7 +17,6 @@ var connection = mysql.createConnection({
     password : process.env.db_password,
     database : process.env.db_database
   });
-  
 connection.connect();
 
 app.set('view engine', 'handlebars')
@@ -39,7 +25,6 @@ const publicDirectory = path.join(__dirname, './public');
 app.use(express.static(publicDirectory));
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
-
 
 function authenticateTocken(req, res, nex) {
   const authHeader = req.headers['authorization']
@@ -62,6 +47,9 @@ app.get('/info', authenticateTocken, (req, res) => {
     connection.query(`SELECT * FROM photos WHERE id=${req.query.id}`, function (error, results, fields) {
       if (error) throw error;
       //console.log(req.query.id);
+      connection.query(`UPDATE photos SET views=views+1 WHERE id=${req.query.id}`, function (error, viewresults, fields) {
+        if (error) throw error;
+      });
       res.send(results);
     });
   }
@@ -136,39 +124,6 @@ app.post('/login', async (req, res) => {
   
 })
 
-app.post('/test', authenticateTocken, (req, res) => {
-  res.send('Works');
-})
-
-
-app.get('/photo', (req, res) => {
-  try {
-    new ExifImage({ image : 'falls.jpg' }, function (error, exifData) {
-        if (error)
-            console.log('Error: '+error.message);
-        else {
-            
-            let photoExif = {
-              camera : exifData.image.Make,
-              model : exifData.image.Model,
-              fstop : exifData.exif.ApertureValue,
-              iso : exifData.exif.ISO,
-            }
-            // Do something with your data!
-            // const a = math.fraction(exifData.exif.ExposureTime)
-            // console.log(a.n + '/' +a.d + ' sec');
-            // console.log(exifData.exif.FocalLength + 'mm')
-            // var lat1 = exifData.gps.GPSLatitude[0].toString() + '.' + exifData.gps.GPSLatitude[1].toString().replace('.', '') + exifData.gps.GPSLatitude[2].toString()
-            // var lng1 = exifData.gps.GPSLongitude[0].toString() + '.' + exifData.gps.GPSLongitude[1].toString().replace('.', '') + exifData.gps.GPSLongitude[2].toString()
-            // var GPSData = ExifGPS(lat1, exifData.gps.GPSLatitudeRef, lng1, exifData.gps.GPSLongitudeRef )
-            res.send(photoExif);
-          }
-    });
-} catch (error) {
-    console.log('Error: ' + error.message);
-}
-})
-
 app.get('/radius', authenticateTocken, (req, res) => {
   try {
     let lat = req.query.lat;
@@ -177,9 +132,7 @@ app.get('/radius', authenticateTocken, (req, res) => {
 
     connection.query(`SELECT id,lat,lng, ( 6371 * ACOS( COS( RADIANS( lat ) ) * COS( RADIANS( ${lat} ) ) * COS( RADIANS( ${lng} ) - RADIANS( lng ) ) + SIN( RADIANS( lat ) ) * SIN( RADIANS( ${lat}) ) ) ) AS distance FROM photos WHERE status=1 HAVING distance <= ${radius} ORDER BY distance ASC;`, function (error, results, fields) {
       if (error) throw error;
-      console.log(`Lat : ${req.query.lat}`)
-      console.log(`Lng :  ${req.query.lng}`)
-      console.log(`Radius : ${req.query.radius}`)
+      console.log(results)
       res.send(results);
     });
   }
@@ -193,33 +146,40 @@ app.post("/upload", upload.single("photo"), uploadFiles);
     fs.rename(`./public/img/${req.file.filename}`, `./public/img/${req.file.filename}.jpg`, function(err) {
       if (err) {
           console.log('ERROR: ' + err);
-          
       }
       console.log('File renamed!!');
+      res.json({ message: "Successfully uploaded files", image: `${req.file.filename}.jpg` });
   });
-  new ExifImage({ image : `${req.file.filename}.jpg` }, function (error, exifData) {
-
-  });
-     res.json({ message: "Successfully uploaded files", image: `${req.file.filename}.jpg` });
 }
 
-function ExifGPS(lat, latRef, lng, lngRef) {
-    let PicLat
-    let PicLng
-
-    if(latRef === 'S') {
-      PicLat = `-${lat}`
-    } else {
-      PicLat = lat
+app.post('/picsave', authenticateTocken, (req, res) => {
+  try {
+    let userdata = {
+      user: req.body.username,
+      title: req.body.title,
+      info: req.body.info,
+      camera: req.body.camera,
+      lens: req.body.lens,
+      iso: req.body.iso,
+      shutter: req.body.shutter,
+      aperture: req.body.fstop,
+      likes: 0,
+      views: 0,
+      status: 1,
+      lat: req.body.lat,
+      lng: req.body.lng,
+      filename: req.body.filename
     }
-
-    if(lngRef === 'W') {
-      PicLng = `-${lng}`
-    } else {
-      PicLng = lng
+      connection.query('INSERT INTO photos SET ?', userdata, function (error, results, fields) {
+        if (error) throw error;
+        res.json({ message: "Saved"});
+      });
     }
-    return {PicLat, PicLng}
-}
+    catch (exception_var) {
+      console.log(exception_var)
+    }
+  console.log(req.body)
+})
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)
