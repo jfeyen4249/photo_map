@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/2180f850ac.js" crossorigin="anonymous"></script>
+    <title>Search Setup</title>
+    <style>
+        *{
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+            list-style: none;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(90deg, #4e65ff, #92effd, #964848);
+        }
+
+        .searchBox {
+            display: flex;
+            justify-content: space-between;
+            width: 500px;
+            height: 60px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
+        }
+
+        .searchBox .dropdown{
+            position: relative;
+        }
+
+        .searchBox .dropdown .defaultOption{
+            width: 150px;
+            height: 60px;
+            line-height: 60px ;
+            text-align: center;
+            cursor: pointer;
+            border-right: 2px solid rgb(168,168, 168);
+            color: rgb(70,70,70);
+        }
+
+        .searchBox .dropdown ul{
+            display: none;
+            position: absolute;
+            border-radius: 5px;
+            top: 70px;
+            background-color: white;
+            width: 150px;
+            text-align: center;
+            padding-top: 20px;
+        } 
+
+        .searchBox .dropdown ul.active{
+            display: block;
+        }
+
+
+        .searchBox .dropdown ul li{
+            padding-bottom: 20px;
+            color: rgb(70,70,70);
+            cursor: pointer;
+        }
+
+        .wrapper .searchBox .searchField {
+            width: 450px;
+            height: 60px;
+            position: relative;
+        }
+
+        .wrapper .searchBox .searchField input {
+            width: 100%;
+            height: 100%;
+            outline: none;
+            border: none;
+            padding-left: 20px;
+        }
+
+        .wrapper .searchBox .searchField i {
+            position: absolute;
+            top: 0;
+            right: 20px;
+            line-height: 60px;
+            cursor: pointer;
+        }
+
+
+
+
+
+
+
+
+    </style>
+</head>
+<body>
+    
+    <div class="wrapper">
+        <div class="searchBox">
+            <div class="dropdown">
+                <div class="defaultOption">All</div>
+                <ul class="ul">
+                    <li onclick="selectOption(this)">All</li>
+                    <li onclick="selectOption(this)">Username</li>
+                    <li onclick="selectOption(this)">Hashtag</li>
+                </ul>
+            </div>
+            <div class="searchField">
+                <input type="text" class="input" placeholder="Search" id="searchbox" onkeydown="search()"><i class="fa-solid fa-magnifying-glass" id="searchbtn"></i>
+            </div>
+        </div>    
+    </div>
+
+
+
+    <script>
+        let defaultOption = document.querySelector('.defaultOption');
+        let searchbox = document.getElementById('searchbox')
+        let searchbtn = document.getElementById('searchbtn')
+        let ul = document.querySelector('.ul');
+        
+        function search()  {
+            console.log(searchbox.value)
+            fetch(`/find?type=username&search=${searchbox.value}`)
+  		    .then(response => response.json())
+  		    .then(data => {
+			  for(let i = 0; i < data.length; i++) {
+            	let obj = data[i]
+                console.log(obj.user)
+         }  
+	   });
+        }
+
+        
+        defaultOption.onclick = function() {
+            ul.classList.toggle("active")
+         }
+
+         function selectOption(listitem) {
+            
+            let value = listitem.innerHTML
+            defaultOption.innerHTML = value
+            
+            if(defaultOption.innerHTML == 'Username') {
+                console.log("yes")
+                searchbtn.classList.remove = 'fa-solid fa-magnifying-glass'
+                searchbtn.classList.add = 'fa-solid fa-user-magnifying-glass'
+            }
+
+
+
+
+           // <i class="fa-solid fa-user-magnifying-glass"></i>
+            ul.classList.toggle("active")
+
+
+         }
+
+    </script>
+</body>
+</html>

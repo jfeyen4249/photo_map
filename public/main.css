@@ -1,11 +1,20 @@
+*{
+    box-sizing: border-box;
+    list-style: none;
+}
+
 body {
     padding: 0;
     margin: 0;
+    overflow: hidden;
+
 }
 html, body, #map {
     height: 100%;
     width: 100%;
 }
+
+
 
 .fa-heart {
     color: black;
@@ -19,6 +28,41 @@ section {
     /* margin-top: 2%; */
 }
 
+
+.multi-search-filter{
+    border:1px solid #DDD;
+    border-radius: 3px;
+    padding:3px;
+    min-height: 26px;
+    width: 60px;
+}
+.multi-search-filter > input {
+    border: 0px;
+    outline: none;
+    font-size: 20px;
+}
+.multi-search-item {
+    margin: 2px;
+    padding: 2px 24px 2px 8px;
+    float: left;
+    display: flex;
+    background-color: rgb(204, 204, 204);
+    color: rgb(51, 51, 51);
+    border-radius: 3px;
+    position: relative;
+}
+.multi-search-item > span {
+    font-family: 'Muli';
+    line-height: 18px;
+}
+.multi-search-item > .fa {
+    font-size: 12px;
+    line-height: 18px;
+    margin-left: 8px;
+    position: absolute;
+    right: 8px;
+    top: 2px;
+}
 
 
 section .box {
@@ -34,13 +78,15 @@ section .box {
     color: #000;
     border-bottom-left-radius: 25px;
     border-bottom-right-radius: 25px;
+    animation-name: navanimate;
+    animation-duration: 1s;
 }
 
 section .footer {
     display: block;
     z-index: 5;
     position: fixed;
-    min-width: 50%;
+    min-width: 20%;
     bottom: 0;
     padding: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,1);
@@ -64,7 +110,7 @@ section .footer {
 
 .upload-box {
     display: none;
-    z-index: 5;
+    z-index: 1;
     position: relative;
     width: 80%;
     height: 60%;
@@ -91,7 +137,7 @@ section .footer {
 .login-box {
 
     display: none;
-    z-index: 5;
+    z-index: 1;
     position: relative;
     width: 40%;
     height: 60%;
@@ -104,8 +150,15 @@ section .footer {
     border-radius: 15px;
 }
 
+input, input:before, input:after {
+    -webkit-user-select: initial;
+    -khtml-user-select: initial;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
+    user-select: initial;
+   } 
+
 .add {
-    
     position: relative;
     display: flex;
     justify-content: center;
@@ -114,12 +167,12 @@ section .footer {
 }
 
 .add-box {
-
     display: none;
-    z-index: 5;
+    z-index: 1;
     position: relative;
     content: " ";
     min-width: 80%;
+    max-width: 80%;
     min-height: 81vh;
     padding: 5px;
     box-shadow: 0 5px 15px rgba(0,0,0,1);
@@ -145,12 +198,14 @@ section .footer {
 .add-photo-item11 { grid-area: title; }
 .add-photo-item12 { grid-area: location; }
 .add-photo-item13 { grid-area: button; }
+.add-photo-item14 { grid-area: tag; }
 
 .add-photo-grid-container {
   display: grid;
   min-height: 80vh;
+
   margin-top: 10px;
-  grid-template-rows:  75px 75px 75px 75px auto 75px ;
+  grid-template-rows:  75px 75px 75px 75px auto 75px 75px ;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-template-areas:
   	'title title title title'
@@ -158,6 +213,7 @@ section .footer {
     'gps gps shutter fstop'
     'gps gps iso cat'
     'gps gps info info'
+    'tag tag tag tag'
     'location location add button';
   grid-gap: 3px;
   /* background-color: #2195f328; */
@@ -187,6 +243,10 @@ section .footer {
     width: 265px;
     text-align: center;
     border-radius: 8px;
+}
+
+.tag {
+    width: 100%;
 }
 
 .title {
@@ -220,7 +280,7 @@ section .footer {
 
 #map{
     position: relative;
-    
+  
 }
 
 .btn {
@@ -238,16 +298,30 @@ font-size: 20px;
 }
 
 .btn-small {
-    width: 100px;
+    width: 90px;
+    font-size: 14px;
     margin-left: 15px;
+    margin: 0;
+}
+
+.btn-like {
+    color: white;
+    background-color: #00BFFF;
+}
+
+.btn-favorite {
+    color: white;
+    background-color: #FF6347;
+}
+
+#picid {
+    display: none;
 }
 
 
 
-
-
-
 .login-boxes {
+    
     margin: 10px;
     padding: 0;
     display: block;
@@ -256,6 +330,9 @@ font-size: 20px;
     border-radius: 10px;
     text-align: center;
     font-size: 18px;
+    line-height:18px;
+    font-family: sans-serif;
+
 }
 
 
@@ -295,6 +372,47 @@ z-index: 5;
     margin-top: -35px;
 }
 
+@keyframes photoViewIn {
+    0% {
+        opacity: 0;
+        transform: translatex(-400px);
+    }
+    50% {
+        opacity: .5;
+    }
+
+    75% {
+        opacity: .8; 
+        transform: translatex(50px);
+    }
+
+    100% {
+        opacity: 1; 
+        transform: translatex(0px);
+    }
+}
+
+
+@keyframes navanimate {
+    0% {
+        opacity: 0;
+        transform: translatex(-400px);
+    }
+    50% {
+        opacity: .5;
+    }
+
+    75% {
+        opacity: .8; 
+        transform: translatex(50px);
+    }
+
+    100% {
+        opacity: 1; 
+        transform: translatex(0px);
+    }
+}
+
 .view-box {
     display: block;
     z-index: 5;
@@ -308,6 +426,8 @@ z-index: 5;
     backdrop-filter: blur(50px);
     color: #000;
     border-radius: 15px;
+    animation-name: photoViewIn;
+    animation-duration: .5s;
 }
 
 
@@ -346,15 +466,127 @@ z-index: 5;
     background-repeat: no-repeat;
 }
 
+.photo-details {
+    
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    margin: 10px;
+    height: 50%;
+    
+}
+
+.camerainfo {
+    
+    flex-direction: row;
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    background-color: #60645c56;
+    color: white;
+    border-radius: 10px;
+}
+
+.camera-settings {
+    font-size: 14px;
+  
+}
+
+.tags {
+    display: flex;
+    margin-top: 20%;
+    flex-direction: column;
+}
+
+.tag-title {
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.tag {
+    display: flex;
+    flex-direction: row;
+}
+
+.keyword-tags {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 5px;
+    font-size: 12px;
+    flex-direction: row;
+    background-color: #44790756;
+    color: white;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border-radius: 10px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 h1 {
     font-size: 28px;
     font-weight: 200;
     text-decoration: underline;
+    
 }
 
 #info {
     font-size: 18px;
     font-weight: 100;
+    margin-top: -40px;
 }
 
 .photo-btn {
@@ -371,6 +603,11 @@ h1 {
     width: 99%;
 }
 
+.footer-btn-search {
+    display: none;
+    width: 99%;
+}
+
 textarea {
     width: 96%;
     height: 80%;
@@ -380,4 +617,126 @@ h6 {
     margin: 0;
     padding: 0;
     font-size: 28px;
+}
+
+
+.sbox{
+    display: none;
+    z-index: 0;
+    display: flex;
+    position: fixed;
+    justify-content: center;
+    margin-top: 40px;
+    left: 50%;
+    transform: translate(-50%);
+}
+
+.sbox.active {
+    display: block;
+}
+
+.sbox.active {
+    z-index: 8;
+}
+
+.searchBox {
+    display: flex;
+    justify-content: space-between;
+    width: 500px;
+    height: 60px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0px 10px 10px rgba(0,0,0,0.1);
+}
+
+
+
+.searchBox .dropdown .defaultOption{
+    width: 150px;
+    height: 60px;
+    line-height: 60px ;
+    text-align: center;
+    cursor: pointer;
+    border-right: 2px solid rgb(168,168, 168);
+    color: rgb(70,70,70);
+}
+
+.searchBox .dropdown ul{
+    display: none;
+    position: absolute;
+    border-radius: 5px;
+    top: 70px;
+    background-color: white;
+    width: 150px;
+    text-align: center;
+    padding-top: 20px;
+} 
+
+.searchBox .dropdown ul.active{
+    display: block;
+}
+
+
+.searchBox .dropdown ul li{
+    padding-bottom: 20px;
+    color: rgb(70,70,70);
+    cursor: pointer;
+    text-align: center;
+}
+
+.wrapper .searchBox .searchField {
+    width: 450px;
+    height: 60px;
+    position: relative;
+}
+
+.wrapper .searchBox .searchField input {
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border: none;
+    padding-left: 20px;
+}
+
+.wrapper .searchBox .searchField i {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    line-height: 60px;
+    cursor: pointer;
+}
+
+.multi-search-filter{
+    border:1px solid #DDD;
+    border-radius: 3px;
+    padding:3px;
+    min-height: 26px;
+    width: 60px;
+}
+.multi-search-filter > input {
+    border: 0px;
+    outline: none;
+    font-size: 20px;
+}
+.multi-search-item {
+    margin: 2px;
+    padding: 2px 24px 2px 8px;
+    float: left;
+    display: flex;
+    background-color: rgb(204, 204, 204);
+    color: rgb(51, 51, 51);
+    border-radius: 3px;
+    position: relative;
+}
+.multi-search-item > span {
+    font-family: 'Muli';
+    line-height: 18px;
+}
+.multi-search-item > .fa {
+    font-size: 12px;
+    line-height: 18px;
+    margin-left: 8px;
+    position: absolute;
+    right: 8px;
+    top: 2px;
 }

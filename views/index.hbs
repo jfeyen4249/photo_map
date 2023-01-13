@@ -2,12 +2,14 @@
 <html>
 <head>
     <title>PhotoMap - A photographers guide</title>
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Muli&display=swap" rel="stylesheet">
     <script src="/leaflet.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons"
-      rel="stylesheet">
-<link rel="stylesheet" href="/leaflet-beautify-marker-icon.css">
-<script src="/leaflet-beautify-marker-icon.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="/leaflet-beautify-marker-icon.css">
+    <script src="/leaflet-beautify-marker-icon.js"></script>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/leaflet.css"/>
     <link rel="stylesheet" href="/main.css"/>
@@ -16,25 +18,32 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
     
 </head>
-<body>
+<body> 
     <div id="map">
+
+        
         <section>
-            <div class="box" id="box">
+            <div class="box" id="box" onclick="blockClick(event)">
                 <button class="btn" id="add" onclick="addphotosopen();"><i class="fa fa-plus-circle"></i> Add Photo</button>
                 <button class="btn" id="myphotos" onclick="myphotos();"><i class="fa fa-camera-retro"></i> My Photos</button>
-                <button class="btn" id="myfavs" onclick="myfavs();"><i class="fa fa-heart"></i> My Favorites</button>
+                <button class="btn" id="myfavs" onclick="myfavs(event);"><i class="fa fa-heart"></i> My Favorites</button>
                 <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button>
                 <button class="btn" onclick="openloginbox();" id="top"><i class="fa fa-list"></i> Top 50</button>
-                <button class="btn" id="about"><i class="fa fa-info"></i> About Photo Map</button>
-                <button class="btn" onclick="logout();" id="logout"><i class="fa fa-user"></i> Logout</button>
+                <button class="btn" id="about"><i class="fa fa-info"></i> About PhotoMap</button>
+                <button class="btn" onclick="logout();" id="logout"><i class="fa fa-user"></i> My Account</button>
+                <button class="btn" onclick="logout();" id="logout"><i class="fa fa-sign-out"></i> Logout</button>
             </div>
 
+            
+
             <div class="footer" id="footer">
-                <h1 id="footer-text" >Zoom in to see photos on the map</h1><button onclick="saveMapMarker();" class="btn footer-btn" id="footer-btn">Use this location</button>
+                <h1 id="footer-text" >Zoom in to see photos on the map</h1>
+                <button onclick="saveMapMarker();" class="btn footer-btn" id="footer-btn">Use this location</button>
+                <button onclick="disableSearch();" class="btn footer-btn-search" id="footer-btn-search">Close Search</button>
             </div>
             </section>
 
-        <div class="add">
+        <div class="add"  onclick="blockClick(event)">
             <div class="add-box">
                 <div class="add-photo-grid-container">
                     <div id="titlebox" class="add-photo-item11"><input id="title" placeholder="Photo Title" id="title" class="add-inputs title"></div>
@@ -46,26 +55,90 @@
                     <div id="fstop" class="add-photo-item7"><input id="fstoptext" placeholder="fstop" class="add-inputs"></div>
                     <div id="cat" class="add-photo-item8"><select id="catSelect"></select></div>
                     <div id="infobox" class="add-photo-item9"> <h6>Photo Description</h6><textarea name="info" id="infotext" cols="30" rows="10"></textarea> </div>
+                    <div class="tag">
+
+                        <div id="keywords" class="multi-search-filter" onclick="Array.from(this.children).find(n=>n.tagName==='INPUT').focus()">
+                            <input type="text" onkeyup="multiSearchKeyup(this)">
+                        </div>
+                    </div>
+                        
+
+
                     <div id="addfile" class="add-photo-item10"><input id='files' type="file" accept="image/jpeg" onchange="uploadPic()"></div>
                     <div id="latlng" class="add-photo-item12"><p class="gpspoints" id="lat">Lat</p> <p class="gpspoints" id="lng">Lng</p><button onclick="setMapMarker();" id="GPSselect" class="btn btn-small gps-btn">Select</button></div>
                     <div class="add-photo-item13"><button class="btn btn-small" onclick="SaveImage();">Save</button><button class="btn btn-small" onclick="addphotosclose();">Cancel</button></div>
                   </div>
             </div>
         </div>
+        <div class="sbox"  onclick="blockClick(event)">
+            <div class="wrapper">
+            <div class="searchBox">
+                <div class="dropdown">
+                    <div class="defaultOption">All</div>
+                    <ul class="ul">
+                        <li onclick="selectOption(this)">All</li>
+                        <li onclick="selectOption(this)">Username</li>
+                        <li onclick="selectOption(this)">Hashtag</li>
+                    </ul>
+                </div>
+                <div class="searchField">
+                    <input type="text" class="input" placeholder="Search" id="searchbox" onkeydown="search()"><i class="fa-solid fa-magnifying-glass" id="searchbtn"></i>
+                </div>
+            </div>    
+        </div>
+        </div>
 
-        <div class="view-photo">
-            <div class="view-box">
+        
+        <div class="view-photo"  onclick="blockClick(event)">
+            <input id="picid">
+            <div class="view-box" id="view-photo">
                 <div class="photo-grid-container">
                     <div class="photo"></div>
                     <div class="info"> <h1 id="pic-title"></h1> <br> <p id="info"></p> <br>
-                    <i class="fa fa-heart" onclick="PicLike();" id="likebutton" aria-hidden="true">
-                    <button class="btn" onclick="closePhoto()">Close</button>
+                    <div class="photo-details">
+
+                        <div class="camera-details">
+
+                            <div class="camera" id="camera-body"></div>
+                            <div class="camera" id="camera-lens"></div>
+
+                        </div>
+
+                        <div class="camerainfo">
+                            <div class="settings">
+                                <p class="camera-settings"  id="camera-iso">/p>
+                                </div>
+                            <div class="settings">
+                                <p class="camera-settings" id="camera-fstop"></p>
+                            </div>
+                            <div class="settings">
+                                <p class="camera-settings" id="camera-shutter"></p>
+                            </div>
+                        </div>
+
+                        <div class="tags">
+                            <div class="tag-title">Tags</div>
+                            <div class="tag" id="keyword-tag"></div>
+                        </div>
+
+
+                    </div>
+                    
+                    
+                    <button class="btn btn-small" onclick="lastpic()"><i class="fa fa-arrow-left" aria-hidden="true"></i> Prev</button>
+                    <button class="btn btn-small" onclick="like();" id="like-btn" ><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span id="likes">0</span> Likes</button>
+                    <button class="btn btn-small" onclick="addfav()" id="favorite-btn" ><i class="fa fa-star" aria-hidden="true"></i> Favorite</button>
+                    <button class="btn btn-small" onclick="nextpic()">Next <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                    <button class="btn btn-small" id="cloes-btn" onclick="closePhoto()"> <i class="fa fa-window-close" aria-hidden="true"></i> Close</button>
+
+                    
                     </div>  
+                    
                   </div> 
             </div>
         </div>
 
-        <div class="login">
+        <div class="login" id="login_box" onclick="blockClick(event)">
             <div class="login-box">
                 <div class="login-grid-container">
                     <div class="item1">Sign up or log into your Account</div>
@@ -73,9 +146,10 @@
                         <center>
                             <br>
                         Login
-                        <input name="username" id="username" placeholder="username" class="login-boxes">
-                        <input name="password" id="password" placeholder="Password" class="login-boxes" type="password">
+                        <input name="username" id="username" placeholder="Username" class="login-boxes" type="text" onclick="blockClick(event)" required>
+                        <input name="password" id="password" placeholder="Password" class="login-boxes" type="password" onclick="blockClick(event)" required>
                         <button class="btn" onclick="login();"><i class="fa fa-key"></i> Login</button>
+                        <button class="btn" onclick="guest();"><i class="fa fa-key"></i> View as Guest</button>
                         </center>
                     </div>
                     <div class="item3"><hr width="1" size="300"></div>  
@@ -97,5 +171,40 @@
             </div>
         </div>
     </div>
+
+<script>
+        let defaultOption = document.querySelector('.defaultOption');
+        
+        let sbtn = document.getElementById('search')
+        let searchbox = document.getElementById('searchbox')
+        let searchbtn = document.getElementById('searchbtn')
+        let ul = document.querySelector('.ul');
+        
+        function search()  {
+            console.log(searchbox.value)
+            fetch(`/find?type=username&search=${searchbox.value}`)
+  		    .then(response => response.json())
+  		    .then(data => {
+			  for(let i = 0; i < data.length; i++) {
+            	let obj = data[i]
+                console.log(obj.user)
+         }  
+	   });
+        }
+       
+        defaultOption.onclick = function() {
+            ul.classList.toggle("active")
+         }
+
+         function selectOption(listitem) {
+            let value = listitem.innerHTML
+            defaultOption.innerHTML = value
+           // <i class="fa-solid fa-user-magnifying-glass"></i>
+            ul.classList.toggle("active")
+         }
+
+    </script>
+    
+
 </body>
 </html>
