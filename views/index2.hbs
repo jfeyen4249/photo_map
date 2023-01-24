@@ -13,13 +13,12 @@
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/leaflet.css"/>
     <link rel="stylesheet" href="/main.css"/>
+    <script src="https://code.iconify.design/iconify-icon/1.0.2/iconify-icon.min.js"></script>
     <script defer src="/script.js"></script>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <script src="https://use.fontawesome.com/302da21a09.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.5.0/lib/browser/math.min.js"></script>
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-WB4ZCCLGB3"></script>
+    
 </head>
 <body> 
     <div id="map">
@@ -30,10 +29,10 @@
                 <button class="btn" id="add" onclick="addphotosopen();"><i class="fa fa-plus-circle"></i> Add Photo</button>
                 <button class="btn" id="myphotos" onclick="myphotos();"><i class="fa fa-camera-retro"></i> My Photos</button>
                 <button class="btn" id="myfavs" onclick="myfavs(event);"><i class="fa fa-heart"></i> My Favorites</button>
-                {{!-- <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button> --}}
-                <button class="btn" onclick="toplist();" id="top"><i class="fa fa-list"></i> Top 10</button>
-                <button class="btn" id="about" onclick="aboutopen();"><i class="fa fa-info"></i> About PhotoMap</button>
-                <button class="btn"  id="logout"><i class="fa fa-user"></i> My Account</button>
+                <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button>
+                <button class="btn" onclick="openloginbox();" id="top"><i class="fa fa-list"></i> Top 50</button>
+                <button class="btn" id="about"><i class="fa fa-info"></i> About PhotoMap</button>
+                <button class="btn" onclick="logout();" id="logout"><i class="fa fa-user"></i> My Account</button>
                 <button class="btn" onclick="logout();" id="logout"><i class="fa fa-sign-out"></i> Logout</button>
             </div>
 
@@ -41,23 +40,10 @@
 
             <div class="footer" id="footer">
                 <h1 id="footer-text" >Zoom in to see photos on the map</h1>
-                <select name="" id="toplist" class="footer-toplist">
-                    <option value="">Select A List</option>
-                    <option value="toplikes" >10 Most Liked Photos</option>
-                    <option value="topfavs" >10 Favorites Photos</option>
-                    <option value="topviews" >10 Most Viewed Photos</option>
-                    
-                    
-                </select>
                 <button onclick="saveMapMarker();" class="btn footer-btn" id="footer-btn">Use this location</button>
                 <button onclick="disableSearch();" class="btn footer-btn-search" id="footer-btn-search">Close Search</button>
             </div>
             </section>
-
-
-
-
-
 
         <div class="add"  onclick="blockClick(event)">
             <div class="add-box">
@@ -86,52 +72,63 @@
                   </div>
             </div>
         </div>
-
-
-
-
-
-
-        <div class="about" id="about_box" onclick="blockClick(event)">
-            <div class="about-box">
-                <div class="about-title">About PhotoMap</div>
-
-                <div class="about-body">
-                    <img src="./joe.jpg" class="about-joe">
-                    <p class="about-text">t! Repellat nostrum cum iure quisquam quaerat assumenda mollitia similique aliquam hic consectetur accusamus, nam officiis, minus quam harum maiores impedit eos quos quidem consequatur autem accusantium provident facilis? Maiores veniam impedit, adipisci sapiente sint quae amet esse aperiam, in et a nobis, voluptates tempora id repudiandae natus beatae. Voluptatibus accusamus similique hic labore ducimus beatae totam repellat deleniti recusandae, vitae expedita at, architecto aliquid magni nesciunt, voluptas dolores a illo! Aliquam vitae eius mollitia eveniet dolores. Assumenda suscipit deleniti quos excepturi, accusantium laborum adipisci labore ipsa, voluptatem natus dolorum et quae. Odio, ut, porro doloremque maxime ipsum id dolores aut nobis ducimus incidunt in, deleniti perspiciatis corrupti? Enim, explicabo!</p>
+        <div class="sbox"  onclick="blockClick(event)">
+            <div class="wrapper">
+            <div class="searchBox">
+                <div class="dropdown">
+                    <div class="defaultOption">All</div>
+                    <ul class="ul">
+                        <li onclick="selectOption(this)">All</li>
+                        <li onclick="selectOption(this)">Username</li>
+                        <li onclick="selectOption(this)">Hashtag</li>
+                    </ul>
                 </div>
-
-                <div class="about-footer">
-                    <button class="github btn" onclick="window.location = 'https://github.com/jfeyen4249/photo_map'">View on Github</button>
-                    <button class="about-close btn" onclick="aboutclose();">Close</button>
+                <div class="searchField">
+                    <input type="text" class="input" placeholder="Search" id="searchbox" onkeydown="search()"><i class="fa-solid fa-magnifying-glass" id="searchbtn"></i>
                 </div>
-            </div>
+            </div>    
+        </div>
         </div>
 
-
-
-
         
+        
+            <div class="view-photo" id="view-photo-box" onclick="blockClick(event)">
+                <input id="picid">
+                <div class="view-box" id="view-photo">
 
+                    <div class="view-title">
+                        <h1 id="pic-title">This is a Photo</h1>
 
+                        <div class="view-photographer">
+                            <div class="view-avatar"></div>
+                        <p class="view-name">jfeyen</p>
+                        </div>
 
-        <div class="view-photo"  onclick="blockClick(event)">
-            <input id="picid">
-            <div class="view-box" id="view-photo">
-                <div class="photo-grid-container">
-                    <div class="photo"></div>
-                    <div class="info">
-                        
-                    <h1 id="pic-title" class="pic-title"></h1>
-                        <div class="tabs">
+                        <div class="view-views">Views: 200</div>
+                    </div>
+
+                    <div class="view-main">
+                        <div class="view-photo-display">
+                            <div class="photo" id="photo"></div>
+                            <div class="view-keywords">
+                                <div class="view-keyword-title">Tags and keywords</div>
+                                <div class="view-keyword-box" id="keyword-tag">
+                                   
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="view-main-info">
+                            
+                            <div class="tabs">
                                 <input type="radio" class="tabs__radio" name="tabs-example" id="tab1" checked>
                                 <label for="tab1" class="tabs__label">Photo Info</label>
                                 <div class="tabs__content" id="view-info">
                                   
                                     <div class="view-camera"> Camera: <span id="camera-body"></span></div>
                                     <div class="view-camera">Lens: <span id="camera-lens"></span></div>
-                                    {{!-- <button class="btn  btn-action" onclick="like();" id="like-btn" ><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span id="likes">0</span> Likes</button>
-                                    <button class="btn btn-action" onclick="addfav()" id="favorite-btn" ><i class="fa fa-star" aria-hidden="true"></i>  Favorite</button> --}}
+                                    <button class="btn  btn-action" onclick="like();" id="like-btn" ><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span id="likes">0</span> Likes</button>
+                                    <button class="btn btn-action" onclick="addfav()" id="favorite-btn" ><i class="fa fa-star" aria-hidden="true"></i>  Favorite</button>
                                         <h3 class="view-camera-title"> Camera Settings </h3>
                                     <div class="view-setting-box">
                                         <div class="view-settings">
@@ -146,48 +143,9 @@
                                     </div>
                                     
                                    <p class="view-text" id="info"></p>
-    
-                                </div>
+                                   <center><button onclick="topFunction()" id="myBtn" class="btn" title="Go to top">Go to top</button></center>
 
-                                <input type="radio" class="tabs__radio" name="tabs-example" id="comments">
-                                <label for="comments" class="tabs__label">Comments (<span id="comment-count"></span>)</label>
-                                <div class="tabs__content">
-                                  
-                                  <div class="comment-main" id="comment-box">
-                                   
-                                    {{!-- <div class="user-comments">
-                                        <div class="comment-box">
-                                            <div class="comment-layout">
-                                                <div>
-                                                <div class="comment-pic"></div> 
-                                                <center><span class="comment-name" id="comment-name">jfeyen</span></center>
-                                                </div>
-                                                <p class="comment-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Error, incidunt dignissimos corporis eligendi quia aspernatur deleniti praesentium totam quo labore optio doloremque est, rerum explicabo. Est optio, nesciunt libero at consequatur laboriosam possimus reiciendis modi facere, consequuntur autem ratione, rerum id eum doloremque voluptates perspiciatis! Expedita odio excepturi, pariatur earum modi deserunt dolore in nisi itaque tempora ad cupiditate labore consequuntur quae dolor placeat eveniet, soluta minima praesentium doloremque perferendis beatae. Vero, ratione assumenda nesciunt expedita quisquam distinctio mollitia exercitationem dolores aperiam soluta esse iste ab consequatur illo optio error natus voluptates, quis pariatur provident minus omnis rem sapiente repellat.</p>
-                                                
-                                            </div>  
-                                            <center> <button class="comment-like-btn" onclick="alert('Liked');"><i class="fa fa-thumbs-o-up comment-thumb" aria-hidden="true"></i>  Like</button> </center>
-                                        </div>
-                                    </div> --}}
 
-                                    {{!-- <div class="user-comments">
-                                        <div class="comment-box">
-                                            <div class="comment-layout">
-                                                <div>
-                                                <div class="comment-pic"></div> 
-                                                <center><span class="comment-name" id="comment-name">jfeyen</span></center>
-                                                </div>
-                                                <p class="comment-text">Lorem ipsum dolor sit, amet consectetur adipisicing elit. Error, incidunt dignissimos corporis eligendi quia aspernatur deleniti praesentium totam quo labore optio doloremque est, rerum explicabo. Est optio, nesciunt libero at consequatur laboriosam possimus reiciendis modi facere, consequuntur autem ratione, rerum id eum doloremque voluptates perspiciatis! Expedita odio excepturi, pariatur earum modi deserunt dolore in nisi itaque tempora ad cupiditate labore consequuntur quae dolor placeat eveniet, soluta minima praesentium doloremque perferendis beatae. Vero, ratione assumenda nesciunt expedita quisquam distinctio mollitia exercitationem dolores aperiam soluta esse iste ab consequatur illo optio error natus voluptates, quis pariatur provident minus omnis rem sapiente repellat.</p>
-                                                
-                                            </div>  
-                                            <center> <button class="comment-like-btn" onclick="likeComment(this);"><i class="fa fa-thumbs-o-up comment-thumb" aria-hidden="true"></i>  Like</button> </center>
-                                        </div>
-                                    </div> --}}
-
-                                  </div>
-                                    <div class="add-comment">
-                                    <textarea name="" id="commenttext" cols="55" rows="5"></textarea>
-                                    <button onclick="commentPost()">Comment</button>
-                                    </div>
                                 </div>
 
 
@@ -197,35 +155,32 @@
                                   
                                     <div class="view-about-photographer">
 
-                                        <button class="btn social-btn"><i class="fa fa-facebook-official facebook" aria-hidden="true"></i> Facebook</button>
+                                        <button class="btn social-btn"><i class="fa fa-facebook-official fa-2x facebook" aria-hidden="true"></i> Facebook</button>
                                         <button class="btn social-btn"><i class="fa fa-instagram instragram" aria-hidden="true"></i> Instagram</button>
                                         <button class="btn social-btn"><i class="fa fa-twitter facebook " aria-hidden="true"></i> Twitter</button>
                                         <button class="btn social-btn"><iconify-icon icon="simple-icons:tiktok" class="tiktok"></iconify-icon> Tiktok</button>
-                                        <button class="btn social-btn"><i class="fa fa-chrome website" aria-hidden="true"></i> Website</button>                               
+                                        <button class="btn social-btn"><i class="fa fa-chrome website" aria-hidden="true"></i> Website</button>
+                                        
+                                    
                                     </div>
+                                   
+
                                 </div>
                           </div>
-                    </div>  
-                    
-                  </div> 
-                    <div class="tags">
-                        <div class="tag-title">Tags:</div>
-                        <div class="tag" id="keyword-tag">
-                            <p class="keyword-tags">Winter</p>
-                            <p class="keyword-tags">Winter</p>
-                            <p class="keyword-tags">Winter</p>
                         </div>
-                    </div>
 
-                  <div class="view-ctrbtn">
-                    <button class="btn btn-small" onclick="lastpic()"><i class="fa fa-arrow-left" aria-hidden="true"></i> Prev</button>
-                    <button class="btn btn-small" onclick="like();" id="like-btn" ><i class="fa fa-thumbs-o-up" aria-hidden="true"></i> <span id="likes">0</span> Likes</button>
-                    <button class="btn btn-small" onclick="addfav()" id="favorite-btn" ><i class="fa fa-star" aria-hidden="true"></i> Favorite</button>
-                    <button class="btn btn-small" onclick="nextpic()">Next <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
-                    <button class="btn btn-small" id="cloes-btn" onclick="closePhoto()"> <i class="fa fa-window-close" aria-hidden="true"></i> Close</button>
-                  </div>
+                    </div>      
+
+                    <div class="view-footer">
+                            <button class="btn btn-small view-prev" onclick="lastpic()"><i class="fa fa-arrow-left" aria-hidden="true"></i> Prev</button>
+                            <button class="btn btn-small view-close" id="cloes-btn" onclick="closePhoto()"> <i class="fa fa-window-close" aria-hidden="true"></i> Close</button>
+                             <button class="btn btn-small view-next" onclick="nextpic()">Next <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                    </div>
+                </div>
             </div>
-        </div>
+            
+
+
 
         <div class="login" id="login_box" onclick="blockClick(event)">
             <div class="login-box">
@@ -235,7 +190,7 @@
                         <center>
                             <br>
                         Login
-                        <input name="username"type="text" id="username" placeholder="Username" class="login-boxes" type="text" onclick="blockClick(event)" required>
+                        <input name="username" id="username" placeholder="Username" class="login-boxes" type="text" onclick="blockClick(event)" required>
                         <input name="password" id="password" placeholder="Password" class="login-boxes" type="password" onclick="blockClick(event)" required>
                         <button class="btn" onclick="login();"><i class="fa fa-key"></i> Login</button>
                         <button class="btn" onclick="guest();"><i class="fa fa-key"></i> View as Guest</button>
@@ -292,6 +247,65 @@
             ul.classList.toggle("active")
          }
 
+
+         let mybutton = document.getElementById("myBtn");
+         document.getElementById('view-info').onscroll = function() {
+            console.log('Scroll')
+            scrollFunction()
+        };
+
+        function scrollFunction() {
+            if (document.getElementById('view-info').scrollTop > 20 || document.getElementById('view-info').scrollTop > 20) {
+                mybutton.style.display = "block";
+            } else {
+                mybutton.style.display = "none";
+            }
+        }
+
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+        document.getElementById('view-info').scrollTop = 0;
+        document.getElementById('view-info').scrollTop.scrollTop = 0;
+        }
+
+
+
+        // let mybutton = document.getElementById("myBtn");
+
+        // // When the user scrolls down 20px from the top of the document, show the button
+        // window.onscroll = function() {
+        //     console.log('Scroll')
+        //     scrollFunction()
+        // };
+
+        // function scrollFunction() {
+        // if (document.body.scrollTop > 20 || document.documentElement.scrollTop > 20) {
+        //     mybutton.style.display = "block";
+        // } else {
+        //     mybutton.style.display = "none";
+        // }
+        // }
+
+        // // When the user clicks on the button, scroll to the top of the document
+        // function topFunction() {
+        // document.body.scrollTop = 0;
+        // document.documentElement.scrollTop = 0;
+        // }
+
+
+
+
+
+
+
+         function openCity(cityName) {
+  var i;
+  var x = document.getElementsByClassName("city");
+  for (i = 0; i < x.length; i++) {
+    x[i].style.display = "none";
+  }
+  document.getElementById(cityName).style.display = "block";
+}
     </script>
     
 

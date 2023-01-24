@@ -8,9 +8,13 @@ const dotenv = require('dotenv');
 const path = require('path');
 var bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { re } = require('mathjs');
+var Fraction = require('fractional').Fraction
 dotenv.config({ path: './.env'});
+var ExifImage = require('exif').ExifImage;
+const { Console } = require('console');
 const port = 80;
+
+const math = require('mathjs')
 
 var connection = mysql.createConnection({
     host     : process.env.db_host,
@@ -39,6 +43,33 @@ function authenticateTocken(req, res, nex) {
   })
 }
 
+function dms2deg(s) {
+
+  // Determine if south latitude or west longitude
+  var sw = /[sw]/i.test(s);
+
+  // Determine sign based on sw (south or west is -ve) 
+  var f = sw? -1 : 1;
+
+  // Get into numeric parts
+  var bits = s.match(/[\d.]+/g);
+
+  var result = 0;
+
+  // Convert to decimal degrees
+  for (var i=0, iLen=bits.length; i<iLen; i++) {
+
+    // String conversion to number is done by division
+    // To be explicit (not necessary), use 
+    //   result += Number(bits[i])/f
+    result += bits[i]/f;
+
+    // Divide degrees by +/- 1, min by +/- 60, sec by +/-3600
+    f *= 60;
+  }
+
+  return result;
+}
 
 // ****************************************
 // ****************************************
@@ -53,6 +84,15 @@ app.get('/', (req, res) => {
 app.get('/search', (req, res) => {
   res.render('search')
 })
+
+
+
+
+
+
+
+
+
 
 
 // ****************************************
@@ -94,12 +134,17 @@ app.get('/markers', (req, res) => {
     console.log("Error");
   }
 })
+
+
+
+
+
+
 //  ****************************************
 // ****************************************
 // ****        User Functions          ****
 // ****************************************
 // ****************************************
-
 app.post('/register', async (req, res) => {
     try {
       const salt = await bcrypt.genSalt();
@@ -110,7 +155,7 @@ app.post('/register', async (req, res) => {
             if(results == "") {
               connection.query('INSERT INTO users SET ?', userdata, function (error, results, fields) {
                 if (error) throw error;
-                res.send(results);
+                res.send("Your account is now setup!");
               });
             }else {
               console.log("Not found")
@@ -171,12 +216,36 @@ app.post('/guest', async (req, res) => {
 })
 
 
+app.get('/myview', (req, res) => {
+  let user = req.query.user
+  console.log(user)
+  try {
+    connection.query(`SELECT lat,lng,zoom FROM users WHERE username= '${user}'`, function (error, results, fields) {
+      if (error) throw error;
+      //console.log(req.query.id);
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
+
 // ****************************************
 // ****************************************
 // ****       Marker Functions         ****
 // ****************************************
 // ****************************************
-
 app.get('/cat', authenticateTocken, (req, res) => {
   try {
     connection.query(`SELECT * FROM category WHERE status= '1' ORDER BY category asc`, function (error, results, fields) {
@@ -189,14 +258,70 @@ app.get('/cat', authenticateTocken, (req, res) => {
   }
 })
 
+// app.post("/upload", upload.single("photo"), uploadFiles);
+//   function uploadFiles(req, res) {
+//     fs.rename(`./public/img/${req.file.filename}`, `./public/img/${req.file.filename}.jpg`, function(err) {
+//       if (err) {
+//           console.log('ERROR: ' + err);
+//       }
+//       console.log('File renamed!!');
+//       res.json({ message: "Successfully uploaded files", image: `${req.file.filename}.jpg` });
+//   });
+// }
+
+
 app.post("/upload", upload.single("photo"), uploadFiles);
   function uploadFiles(req, res) {
+    
     fs.rename(`./public/img/${req.file.filename}`, `./public/img/${req.file.filename}.jpg`, function(err) {
       if (err) {
           console.log('ERROR: ' + err);
       }
-      console.log('File renamed!!');
+      
+
+      try {
+        new ExifImage({ image : `./public/img/${req.file.filename}.jpg` }, function (error, exifData) {
+            if (error)
+                console.log('Error: '+error.message);
+            else
+                //console.log(exifData); // Do something with your data!
+                var f = math.fraction(exifData.exif.ExposureTime);
+                let gpsLat = dms2deg(`${exifData.gps.GPSLatitudeRef} ${exifData.gps.GPSLatitude[0]} ${exifData.gps.GPSLatitude[1]}\' ${exifData.gps.GPSLatitude[2]}\"`)
+                let gpsLNG = dms2deg(`${exifData.gps.GPSLongitudeRef} ${exifData.gps.GPSLongitude[0]} ${exifData.gps.GPSLongitude[1]}\' ${exifData.gps.GPSLongitude[2]}\"`)
+
+
+                // console.log(exifData.gps)
+            
+
+                let img_data = {
+                  message: "Successfully uploaded files", 
+                  image: `${req.file.filename}.jpg`,
+                  camera: `${exifData.image.Make} ${exifData.image.Model}`,
+                  lens: exifData.exif.LensModel,
+                  iso: exifData.exif.ISO,
+                  shutter: `${f.n}/${f.d} sec`,
+                  aperture: `f/${exifData.exif.ApertureValue}`,
+                  gps: {
+                    lat: gpsLat,
+                    lng: gpsLNG
+                  }
+                }
+                console.log(img_data)
+                res.send(JSON.stringify(img_data))
+
+
+
+        });
+    } catch (error) {
       res.json({ message: "Successfully uploaded files", image: `${req.file.filename}.jpg` });
+    }
+
+
+
+
+      
+
+     
   });
 }
 
@@ -232,12 +357,23 @@ app.post('/picsave', authenticateTocken, (req, res) => {
 })
 
 
-// ******************************************************************************************************************************************************************************
-// ******************************************************************************************************************************************************************************
-// ****                                                             Search Functions                                                                                         ****
-// ******************************************************************************************************************************************************************************
-// ******************************************************************************************************************************************************************************
 
+
+
+
+
+
+
+
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ************************************************-------------------------------------------------------------------------------------*****************************************
+// ***********************************************|                                Search Functions                                     |****************************************
+// ************************************************--------------------------------------------------------------------------------------****************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
 app.get('/toplist', (req, res) => {
   try {
     let cat = req.body.cat;
@@ -354,8 +490,6 @@ app.get('/like', (req, res) => {
 
 
 
-
-
 // ****************************************
 // ****************************************
 // ****       Favorites API's          ****
@@ -423,9 +557,108 @@ app.get('/myfavs', (req, res) => {
  })
 
 
-app.get('/test', (req, res) => {
-  res.render('test')
+// ****************************************
+// ****************************************
+// ****       Top 50 List API's        ****
+// ****************************************
+// ****************************************
+
+ app.get('/topfavs', (req, res) => {
+    try {
+      let user = req.query.user;
+      //connection.query(`SELECT * FROM photos JOIN favorites ON photos.id = favorites.photo_id WHERE favorites.user = '${user}';`, function (error, results, fields) {
+        connection.query(`SELECT photo_id, count(*) as favorite, photos.id, photos.lat, photos.lng FROM favorites JOIN photos ON favorites.photo_id = photos.id GROUP BY favorites.photo_id ORDER BY favorite DESC Limit 10`, function (error, results, fields) {
+        if (error) throw error;
+        res.send(results);
+      });
+    }
+    catch (exception_var) {
+      console.log("Error");
+    }
+ })
+
+
+ app.get('/toplikes', (req, res) => {
+  try {
+    let user = req.query.user;
+    connection.query(`SELECT * FROM photos  WHERE status=1 ORDER by likes desc limit 10;`, function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+    console.log("Error");
+  }
 })
+
+app.get('/topviews', (req, res) => {
+  try {
+    let user = req.query.user;
+    connection.query(`SELECT * FROM photos  WHERE status=1 ORDER by views desc limit 10;`, function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+    console.log("Error");
+  }
+})
+
+
+
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ************************************************-------------------------------------------------------------------------------------*****************************************
+// ***********************************************|                                  Photo Comments                                     |****************************************
+// ************************************************--------------------------------------------------------------------------------------****************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+// ******************************************************************************************************************************************************************************
+
+app.get('/comments', (req, res) => {
+  let photo_id = req.query.id
+  try {
+    let user = req.query.user;
+    connection.query(`SELECT * FROM comments WHERE photo_id = '${photo_id}'  ORDER by id desc;`, function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+    console.log("Error");
+  }
+})
+
+app.post('/likecomments', (req, res) => {
+  let comment_id = req.query.id
+  try {
+    connection.query(`UPDATE comments SET likes = likes + 1 WHERE id = '${comment_id}'  ORDER by id desc;`, function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+    console.log("Error");
+  }
+})
+
+app.post('/comments', (req, res) => {
+  let comment = req.body
+  try {
+    connection.query(`INSERT INTO comments SET ?`, comment , function (error, results, fields) {
+      if (error) throw error;
+      res.send(results);
+    });
+  }
+  catch (exception_var) {
+    console.log("Error");
+  }
+})
+
+
+
+
 
 app.listen(port, () => {
   console.log(`Example app listening at http://localhost:${port}`)

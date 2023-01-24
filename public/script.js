@@ -4,6 +4,14 @@
 // ****************************************
 // ****************************************
 //import exifr from './node_modules/exifr/dist/lite.esm.js'
+// 
+// const { i } = require("mathjs");
+
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+
+gtag('config', 'G-WB4ZCCLGB3');
 
 var zoomLock = false;                               //map lock for on.map drag and zoom functions
 const buttonBox = document.getElementById('box') ;   //Menubar box
@@ -19,6 +27,8 @@ let fstop = document.getElementById("fstop");
 let cat = document.getElementById("cat");
 let info = document.getElementById("infobox");
 let sbox = document.querySelector('.sbox');
+let comment_text = document.getElementById("commenttext");
+let toplistBox = document.getElementById('toplist')
 
 let loaded_id = [];
 let picCounter = 0;
@@ -44,320 +54,26 @@ let activeSearch = false
 
 window.addEventListener("keydown", function (event) {
     
-    if (event.code == 'ArrowRight') {
+    if (event.code == 'ArrowRight' && comment_text.focus == false) {
         nextpic()
     } 
 
 
-    if (event.code == 'ArrowLeft') {
+    if (event.code == 'ArrowLeft' && comment_text.focus == false) {
         lastpic()
-      } 
+    } 
 
       if (event.code == 'Escape') {
         // Handle the event with KeyboardEvent.key
         closePhoto();
       } 
 
+      if (event.code == 'Enter') {
+        commentPost()
+    } 
+    
+
   });
-
-
-
-// **********************************************************************************************************************************
-// **********************************************************************************************************************************
-// ****                                       Faction Converstion for Exif Data                                                  ****
-// **********************************************************************************************************************************
-// **********************************************************************************************************************************
-
-  Fraction = function(numerator, denominator)
-  {
-      /* double argument invocation */
-      if (numerator && denominator) {
-          if (typeof(numerator) === 'number' && typeof(denominator) === 'number') {
-              this.numerator = numerator;
-              this.denominator = denominator;
-          } else if (typeof(numerator) === 'string' && typeof(denominator) === 'string') {
-              // what are they?
-              // hmm....
-              // assume they are ints?
-              this.numerator = parseInt(numerator);
-              this.denominator = parseInt(denominator);
-          }
-      /* single-argument invocation */
-      } else if (!denominator) {
-          num = numerator; // swap variable names for legibility
-          if (typeof(num) === 'number') {  // just a straight number init
-              this.numerator = num;
-              this.denominator = 1;
-          } else if (typeof(num) === 'string') {
-              var a, b;  // hold the first and second part of the fraction, e.g. a = '1' and b = '2/3' in 1 2/3
-                         // or a = '2/3' and b = undefined if we are just passed a single-part number
-              [a, b] = num.split(' ');
-              /* compound fraction e.g. 'A B/C' */
-              //  if a is an integer ...
-              if (a % 1 === 0 && b && b.match('/')) {
-                  return (new Fraction(a)).add(new Fraction(b));
-              } else if (a && !b) {
-                  /* simple fraction e.g. 'A/B' */
-                  if (typeof(a) === 'string' && a.match('/')) {
-                      // it's not a whole number... it's actually a fraction without a whole part written
-                      var f = a.split('/');
-                      this.numerator = f[0]; this.denominator = f[1];
-                  /* string floating point */
-                  } else if (typeof(a) === 'string' && a.match('\.')) {
-                      return new Fraction(parseFloat(a));
-                  /* whole number e.g. 'A' */
-                  } else { // just passed a whole number as a string
-                      this.numerator = parseInt(a);
-                      this.denominator = 1;
-                  }
-              } else {
-                  return undefined; // could not parse
-              }
-          }
-      }
-      this.normalize();
-  }
-  
-  
-  Fraction.prototype.clone = function()
-  {
-      return new Fraction(this.numerator, this.denominator);
-  }
-  
-  
-  /* pretty-printer, converts fractions into whole numbers and fractions */
-  Fraction.prototype.toString = function()
-  {
-      var wholepart = Math.floor(this.numerator / this.denominator);
-      var numerator = this.numerator % this.denominator 
-      var denominator = this.denominator;
-      var result = [];
-      if (wholepart != 0) 
-          result.push(wholepart);
-      if (numerator != 0)  
-          result.push(numerator + '/' + denominator);
-      return result.length > 0 ? result.join(' ') : 0;
-  }
-  
-  
-  /* destructively rescale the fraction by some integral factor */
-  Fraction.prototype.rescale = function(factor)
-  {
-      this.numerator *= factor;
-      this.denominator *= factor;
-      return this;
-  }
-  
-  
-  Fraction.prototype.add = function(b)
-  {
-      var a = this.clone();
-      if (b instanceof Fraction) {
-          b = b.clone();
-      } else {
-          b = new Fraction(b);
-      }
-      td = a.denominator;
-      a.rescale(b.denominator);
-      b.rescale(td);
-  
-      a.numerator += b.numerator;
-  
-      return a.normalize();
-  }
-  
-  
-  Fraction.prototype.subtract = function(b)
-  {
-      var a = this.clone();
-      if (b instanceof Fraction) {
-          b = b.clone();  // we scale our argument destructively, so clone
-      } else {
-          b = new Fraction(b);
-      }
-      td = a.denominator;
-      a.rescale(b.denominator);
-      b.rescale(td);
-  
-      a.numerator -= b.numerator;
-  
-      return a.normalize();
-  }
-  
-  
-  Fraction.prototype.multiply = function(b)
-  {
-      var a = this.clone();
-      if (b instanceof Fraction)
-      {
-          a.numerator *= b.numerator;
-          a.denominator *= b.denominator;
-      } else if (typeof b === 'number') {
-          a.numerator *= b;
-      } else {
-          return a.multiply(new Fraction(b));
-      }
-      return a.normalize();
-  }
-  
-  Fraction.prototype.divide = function(b)
-  {
-      var a = this.clone();
-      if (b instanceof Fraction)
-      {
-          a.numerator *= b.denominator;
-          a.denominator *= b.numerator;
-      } else if (typeof b === 'number') {
-          a.denominator *= b;
-      } else {
-          return a.divide(new Fraction(b));
-      }
-      return a.normalize();
-  }
-  
-  Fraction.prototype.equals = function(b)
-  {
-      if (!(b instanceof Fraction)) {
-          b = new Fraction(b);
-      }
-      // fractions that are equal should have equal normalized forms
-      var a = this.clone().normalize();
-      var b = b.clone().normalize();
-      return (a.numerator === b.numerator && a.denominator === b.denominator);
-  }
-  
-  
-  /* Utility functions */
-  
-  /* Destructively normalize the fraction to its smallest representation. 
-   * e.g. 4/16 -> 1/4, 14/28 -> 1/2, etc.
-   * This is called after all math ops.
-   */
-  Fraction.prototype.normalize = (function()
-  {
-  
-      var isFloat = function(n)
-      {
-          return (typeof(n) === 'number' && 
-                  ((n > 0 && n % 1 > 0 && n % 1 < 1) || 
-                   (n < 0 && n % -1 < 0 && n % -1 > -1))
-                 );
-      }
-  
-      var roundToPlaces = function(n, places) 
-      {
-          if (!places) {
-              return Math.round(n);
-          } else {
-              var scalar = Math.pow(10, places);
-              return Math.round(n*scalar)/scalar;
-          }
-      }
-          
-      return (function() {
-  
-          // XXX hackish.  Is there a better way to address this issue?
-          //
-          /* first check if we have decimals, and if we do eliminate them
-           * multiply by the 10 ^ number of decimal places in the number
-           * round the number to nine decimal places
-           * to avoid js floating point funnies
-           */
-          if (isFloat(this.denominator)) {
-              var rounded = roundToPlaces(this.denominator, 9);
-              var scaleup = Math.pow(10, rounded.toString().split('.')[1].length);
-              this.denominator = Math.round(this.denominator * scaleup); // this !!! should be a whole number
-              //this.numerator *= scaleup;
-              this.numerator *= scaleup;
-          } 
-          if (isFloat(this.numerator)) {
-              var rounded = roundToPlaces(this.numerator, 9);
-              var scaleup = Math.pow(10, rounded.toString().split('.')[1].length);
-              this.numerator = Math.round(this.numerator * scaleup); // this !!! should be a whole number
-              //this.numerator *= scaleup;
-              this.denominator *= scaleup;
-          }
-          var gcf = Fraction.gcf(this.numerator, this.denominator);
-          this.numerator /= gcf;
-          this.denominator /= gcf;
-          if ((this.numerator < 0 && this.denominator < 0) || (this.numerator > 0 && this.denominator < 0)) {
-              this.numerator *= -1;
-              this.denominator *= -1;
-          }
-          return this;
-      });
-  
-  })();
-  
-  
-  /* Takes two numbers and returns their greatest common factor.
-   */
-  Fraction.gcf = function(a, b)
-  {
-  
-      var common_factors = [];
-      var fa = Fraction.primeFactors(a);
-      var fb = Fraction.primeFactors(b);
-      // for each factor in fa
-      // if it's also in fb
-      // put it into the common factors
-      fa.forEach(function (factor) 
-      { 
-          var i = fb.indexOf(factor);
-          if (i >= 0) {
-              common_factors.push(factor);
-              fb.splice(i,1); // remove from fb
-          }
-      });
-  
-      if (common_factors.length === 0)
-          return 1;
-  
-      var gcf = (function() {
-          var r = common_factors[0];
-          var i;
-          for (i=1;i<common_factors.length;i++)
-          {
-              r = r * common_factors[i];
-          }
-          return r;
-      })();
-  
-      return gcf;
-  
-  };
-  
-  
-
-  Fraction.primeFactors = function(n) 
-  {
-  
-      var num = Math.abs(n);
-      var factors = [];
-      var _factor = 2;  // first potential prime factor
-  
-      while (_factor * _factor <= num)  // should we keep looking for factors?
-      {      
-        if (num % _factor === 0)  // this is a factor
-          { 
-              factors.push(_factor);  // so keep it
-              num = num/_factor;  // and divide our search point by it
-          }
-          else
-          {
-              _factor++;  // and increment
-          }
-      }
-  
-      if (num != 1)                    // If there is anything left at the end...
-      {                                // ...this must be the last prime factor
-          factors.push(num);           //    so it too should be recorded
-      }
-  
-      return factors;                  // Return the prime factors
-  }
-
-
 
 
 
@@ -370,10 +86,7 @@ window.addEventListener("keydown", function (event) {
 // ****          Map Setup             ****
 // ****************************************
 // ****************************************
-//var map = L.map('map').setView([40.463666324587685, -100.32714843749999], 5);
-var map = L.map('map').setView([42.51152614595525, -90.39482116699217], 15, draggable = false);
-
-
+var map = L.map('map').setView([40.463666324587685, -100.32714843749999], 5);
 mapLink = '<a href="https://openstreetmap.org"></a>'
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -414,9 +127,11 @@ map.on('dragend', function(ev) {
 });
 // Prevents map from loading markers when there is not a logged in user.
 map.on('zoomend', function(ev) {
+     
+    
     if(sessionStorage.getItem('username') !== null && setLocation == false){
         loadMarkers();
-        console.log(map.getZoom())
+        //console.log(map.getZoom())
     }
 });
 // Logs where a user clicked on the map.
@@ -425,11 +140,11 @@ map.on('click', function(ev) {
     const mapLng = ev.latlng.lng.toString()
     addPic.lat = mapLat
     addPic.lng = mapLng
-    console.log('Map clicked: ' + mapLat + ' : ' +  mapLng)
+    //console.log('Map clicked: ' + mapLat + ' : ' +  mapLng)
     if(setLocation == true && document.getElementsByClassName('add-box')[0].style.display == "none") {
         myFeatureGroup.clearLayers();
         L.marker([mapLat, mapLng], markerOptions).addTo(myFeatureGroup).bindPopup("")
-        console.log('Location Selected: ' + addPic.lat + ' - ' + addPic.lng)
+        //console.log('Location Selected: ' + addPic.lat + ' - ' + addPic.lng)
     }
 });
 
@@ -439,8 +154,8 @@ map.on('dblclick', function(ev) {
 
 map.on('keydown', function(ev) {
     ev.map.zoomLock = true
-    map.dragging.disable();
-    console.log("Key")
+    
+    //console.log("Key")
 })
 
 // Prevents map from being dragged when hovering over the top buttons
@@ -499,6 +214,7 @@ function loadMarkers() {
         return
     } else {
         //Markers get cleared before fetching the new markers
+        map.dragging.enable()
     myFeatureGroup.clearLayers();
     //The radius of the current view is calculated 
     loaded_id = []
@@ -545,14 +261,6 @@ function loadMarkers() {
          document.getElementsByClassName('footer')[0].style.display = "block";
     }
     }
-
-
-
-
-
-
-
-
 } 
 
     function blockClick(event) {
@@ -568,43 +276,20 @@ function loadMarkers() {
 
 // This function loads the image, and details from the marker that was clicked.
 function groupClick(event) {
-    // The top menu bar is hidden.
-    document.getElementsByClassName('box')[0].style.display = "none";
-    // The derails are fetched and displayed to the user.
-    console.log(event.layer.test)
-    fetch(`/info?id=${event.layer.test}`, {headers: myHeaders})
-    .then(response => response.json())
-    .then(data => {
-        //console.log(data[0]);
-        closeSearh()
-        document.getElementById('keyword-tag').innerHTML = ''
-        
-        document.getElementById('pic-title').innerHTML = data[0].title
-        document.getElementById('info').innerHTML = data[0].info
-        document.getElementsByClassName('view-photo')[0].style.display = "flex";
-        document.getElementsByClassName('photo')[0].style.backgroundImage = `url('/img/${data[0].filename}')`;
-        
-        document.getElementById('camera-body').innerHTML = data[0].camera
-        document.getElementById('camera-lens').innerHTML = data[0].lens
-
-        let keywords = data[0].tags.split(",") 
-
-        if(keywords.length >1) {     
-            for(i=0; i<keywords.length; i++) {
-                document.getElementById('keyword-tag').innerHTML += `<p class="keyword-tags">${keywords[i]}</p>`
-            }
-        }
-
-        document.getElementById('camera-iso').innerHTML = 'ISO ' +data[0].iso
-        document.getElementById('camera-fstop').innerHTML = data[0].aperture
-        document.getElementById('likes').innerHTML = data[0].likes
-        document.getElementById('camera-shutter').innerHTML = data[0].shutter
-        
-        picView = true
-        document.getElementById('cloes-btn').focus()
-        map.scrollWheelZoom.disable();
-        L.DomEvent.stopPropagation(document.getElementById('map'));
-    });
+    
+     // The top menu bar is hidden.
+     document.getElementsByClassName('box')[0].style.display = "none";
+     // The derails are fetched and displayed to the user.
+     fetch(`/info?id=${event.layer.test}`, {headers: myHeaders})
+     .then(response => response.json())
+     .then(data => {
+         //console.log(data[0].id);
+         document.getElementById('pic-title').innerHTML = data[0].title
+         document.getElementById('info').innerHTML = data[0].info
+         document.getElementsByClassName('view-photo')[0].style.display = "flex";
+         document.getElementsByClassName('photo')[0].style.backgroundImage = `url('/img/${data[0].filename}')`;
+         
+     });
 
     fetch(`/likecheck?picid=${event.layer.test}&userid=${sessionStorage.getItem('username')}`, {headers: myHeaders})
     .then(response => response.json())
@@ -621,11 +306,118 @@ function groupClick(event) {
             document.getElementById('favorite-btn').classList.add('btn-favorite')
         }
     });
-    picid =  event.layer.test
 
+    fetch(`/comments?id=${event.layer.test}`)
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data)
+        document.getElementById('comment-box').innerHTML = ''
+        
+        if(data.length > 0) {
+            document.getElementById('comment-count').innerHTML = data.length
+            for(let i = 0; i < data.length; i++) {
+                let userPic
+                let url = `/img/profile/${data[i].user}.jpg`
+                var http = new XMLHttpRequest(); 
+          
+                
+                if (url.length === 0) { 
+                    output.innerHTML = "Please enter File URL"; 
+                } else { 
+                    http.open('HEAD', url, false); 
+                    http.send(); 
+                    if (http.status === 200) { 
+                        console.log("File exists"); 
+                        userPic = `/img/profile/${data[i].user}.jpg`
+                    } else { 
+                        console.log("File doesn't exists"); 
+                        userPic = `/img/profile/default.png`
+                    } 
+                } 
+            
+
+                document.getElementById('comment-box').innerHTML += `
+                                    <div class="user-comments">
+
+                                        <div class="comment-box">
+                                            <div class="comment-layout">
+                                                <div>
+                                                <img class="comment-pic" src="${userPic}"></img> 
+                                                <center><span class="comment-name" id="comment-name">${data[i].user}</span></center>
+                                                </div>
+                                                <p class="comment-text">${data[i].comment}</p>
+                                                
+                                            </div>  
+                                            <center> <button class="comment-like-btn" id="comment${data[i].id}" onclick="commentLike(${data[i].id});"><i class="fa fa-thumbs-o-up comment-thumb" aria-hidden="true"></i>  Like (<span id="likecount${data[i].id}">${data[i].likes}</span>)</button> </center>
+                                        </div>
+                                    </div>
+                `
+            }
+        } else {
+            document.getElementById('comment-count').innerHTML = data.length
+        }
+    });
+
+
+    L.DomEvent.disableScrollPropagation(document.getElementById('view-photo'))
+    map.dragging.disable()
+    picid =  event.layer.test
+    //console.log('Done')
+
+
+    
 }
 
+function getComments() {
+    fetch(`/comments?id=${picid}`)
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data)
+        document.getElementById('comment-box').innerHTML = ''
+        
+        if(data.length > 0) {
+            document.getElementById('comment-count').innerHTML = data.length
+            for(let i = 0; i < data.length; i++) {
+                let userPic
+                let url = `/img/profile/${data[i].user}.jpg`
+                var http = new XMLHttpRequest(); 
+          
+                
+                if (url.length === 0) { 
+                    output.innerHTML = "Please enter File URL"; 
+                } else { 
+                    http.open('HEAD', url, false); 
+                    http.send(); 
+                    if (http.status === 200) { 
+                        console.log("File exists"); 
+                        userPic = `/img/profile/${data[i].user}.jpg`
+                    } else { 
+                        console.log("File doesn't exists"); 
+                        userPic = `/img/profile/default.png`
+                    } 
+                } 
+                document.getElementById('comment-box').innerHTML += `
+                                    <div class="user-comments">
 
+                                        <div class="comment-box">
+                                            <div class="comment-layout">
+                                                <div>
+                                                <img class="comment-pic" src="${userPic}"></img> 
+                                                <center><span class="comment-name" id="comment-name">${data[i].user}</span></center>
+                                                </div>
+                                                <p class="comment-text">${data[i].comment}</p>
+                                                
+                                            </div>  
+                                            <center> <button class="comment-like-btn" id="comment${data[i].id}" onclick="commentLike(${data[i].id});"><i class="fa fa-thumbs-o-up comment-thumb" aria-hidden="true"></i>  Like (<span id="likecount${data[i].id}">${data[i].likes}</span>)</button> </center>
+                                        </div>
+                                    </div>
+                `
+            }
+        } else {
+            document.getElementById('comment-count').innerHTML = data.length
+        }
+    });
+}
 
 
 // ****************************************
@@ -641,17 +433,110 @@ if(sessionStorage.getItem('username') == 'guest' && sessionStorage.getItem('toke
     document.getElementsByClassName('box')[0].style.display = "none";
     alert("To get back to the login close the page and come back")
     loadMarkers();
+    map.dragging.enable()
+    fetch(`/myview?user=${sessionStorage.getItem('username')}`)
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data)
+        map.panTo(new L.LatLng(data[0].lat, data[0].lng));
+        map.setZoom(data[0].zoom)
+            //map = L.map('map').setView([data[0].lat, data[0].lng], data[0].zoom, draggable = false);
+            map.dragging.enable()
+        });  
 
 }else if(sessionStorage.getItem('username') == null && sessionStorage.getItem('token') == null){
     document.getElementsByClassName('login-box')[0].style.display = "block";
     document.getElementsByClassName('box')[0].style.display = "none";
     document.getElementsByClassName('footer')[0].style.display = "none";
     document.getElementById('login_box').focus()
+    map.dragging.disable()
+    L.DomEvent.disableScrollPropagation(document.getElementById('login_box'))
+
 } else {
     loadMarkers();
     document.getElementsByClassName('login-box')[0].style.display = "none";
     document.getElementsByClassName('box')[0].style.display = "block";
+    map.dragging.enable()
+    fetch(`/myview?user=${sessionStorage.getItem('username')}`)
+    .then(response => response.json())
+    .then(data => {
+        //console.log(data)
+        map.panTo(new L.LatLng(data[0].lat, data[0].lng));
+        map.setZoom(data[0].zoom)
+            //map = L.map('map').setView([data[0].lat, data[0].lng], data[0].zoom, draggable = false);
+        });  
 }
+
+// ****************************************
+// ****************************************
+// ****      Comments Functions        ****
+// ****************************************
+// ****************************************
+
+function commentLike(id) {
+    let Likebtn = document.getElementById(`comment${id}`)
+    let Likebtncount = document.getElementById(`likecount${id}`).innerHTML   
+
+    fetch(`likecomments?id=${id}`, {
+        method: 'post'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.changedRows = 1) {
+            Likebtncount = parseInt(Likebtncount) + 1
+            Likebtn.style.display = "none"
+            //Likebtn.disable = true
+        }
+     });
+}
+
+function commentPost() {
+    
+    let commentdata = {
+        photo_id: picid,
+        comment: comment_text.value,
+        user: sessionStorage.getItem('username')
+    }
+
+    fetch("/comments", {
+        method: 'POST',
+        body: JSON.stringify(commentdata),
+        headers: myHeaders
+    })
+    .then(response => response.json())
+    .then(data => {
+        if(data.affectedRow = 1) {
+            getComments()
+        }
+        
+     });
+
+
+
+    // fetch(`likecomments?id=${id}`, {
+    //     method: 'post'
+    // })
+    // .then(response => response.json())
+    // .then(data => {
+    //     if(data.changedRows = 1) {
+    //         Likebtncount = parseInt(Likebtncount) + 1
+    //         Likebtn.style.display = "none"
+    //     }
+    //  });
+
+    comment_text.value = ''
+}
+
+
+
+
+
+
+
+
+
+
+
 
 // ****************************************
 // ****************************************
@@ -695,7 +580,6 @@ async function login() {
 
 function guest() {
     document.getElementsByClassName('login-box')[0].style.display = "none";
-    sessionStorage.setItem('username', 'guest');
 
     fetch("/guest", {
         method: 'POST',
@@ -705,6 +589,7 @@ function guest() {
 
      });
     loadMarkers();
+    sessionStorage.setItem('username', 'guest')
 }
 
 function closeSearh() {
@@ -716,6 +601,17 @@ function logout() {
     sessionStorage.removeItem("token");
     window.location.reload();
 }
+
+
+function toplist() {
+    activeSearch = true
+    document.getElementsByClassName('footer')[0].style.display = "block";
+    document.getElementById('footer-text').style.display = "none"
+    document.getElementById('footer-btn').style.display = "none"
+    document.getElementById('footer-btn-search').style.display = "block"
+    document.getElementById('toplist').style.display = "block"
+}
+
 
 // ****************************************
 // ****************************************
@@ -756,6 +652,8 @@ function lastpic() {
     } else {
      picCounter = picCounter - 1
     }
+    document.getElementById('like-btn').classList.remove('btn-like')
+    document.getElementById('favorite-btn').classList.remove('btn-favorite')
      // The derails are fetched and displayed to the user.
      fetch(`/info?id=${loaded_id[picCounter]}`, {headers: myHeaders})
      .then(response => response.json())
@@ -798,6 +696,8 @@ function nextpic() {
    if(picCounter == loaded_id.length -1) {
     picCounter = 0 
    }
+   document.getElementById('like-btn').classList.remove('btn-like')
+    document.getElementById('favorite-btn').classList.remove('btn-favorite')
     // The derails are fetched and displayed to the user.
     fetch(`/info?id=${loaded_id[picCounter]}`, {headers: myHeaders})
     .then(response => response.json())
@@ -830,12 +730,15 @@ function nextpic() {
             document.getElementById('favorite-btn').classList.add('btn-favorite')
         }
     });
+
+
 }
 
 // This function closes the photo box.
 function closePhoto() {
     if(sessionStorage.getItem('username') == 'guest'&& sessionStorage.getItem('token') == null) {
         document.getElementsByClassName('view-photo')[0].style.display = "none";
+        map.dragging.enable()
     }else{
          // The photo box is hidded.
         document.getElementsByClassName('view-photo')[0].style.display = "none";
@@ -846,6 +749,7 @@ function closePhoto() {
         document.getElementById('like-btn').classList.remove('btn-like')
         document.getElementById('favorite-btn').classList.remove('btn-favorite')
         map.scrollWheelZoom.enable();
+        map.dragging.enable()
         picid = ""
     }
 }
@@ -856,6 +760,7 @@ function disableSearch() {
     document.getElementById('footer-text').style.display = "none"
     document.getElementById('footer-btn').style.display = "none"
     document.getElementById('footer-btn-search').style.display = "none"
+    document.getElementById('toplist').style.display = "none"
     clearMap()
     map.setZoom(12)
 }
@@ -892,7 +797,7 @@ async function mysearch() {
     
     sbox.classList.toggle("active")
     var frac = new Fraction( 0.002);
-    console.log(frac.toString());
+    //console.log(frac.toString());
 
 }
 
@@ -903,11 +808,11 @@ function signup() {
 function like() {
     //like?picid=43&user=jfeyen
     let likecount = Number(document.getElementById('likes').innerHTML)
-    console.log (likecount + 1)
+    
     fetch(`/like?picid=${picid}&userid=${sessionStorage.getItem('username')}`, {headers: myHeaders})
     .then(response => response.text())
     .then(data => {
-        console.log(data)
+        
         if(data == "Liked") {
             document.getElementById('like-btn').classList.add('btn-like')
             document.getElementById('likes').innerHTML = likecount + 1
@@ -919,7 +824,7 @@ function like() {
 }
 
 function addfav() {
-    console.log(document.getElementById('picid').innerHTML)
+    
     fetch(`/addfav?picid=${picid}&userid=${sessionStorage.getItem('username')}`, {headers: myHeaders})
     .then(response => response.text())
     .then(data => {
@@ -931,6 +836,41 @@ function addfav() {
     });
 }
 
+function aboutopen() {
+    document.getElementsByClassName('about-box')[0].style.display = "flex";
+    document.getElementsByClassName('box')[0].style.display = "none";
+    map.dragging.disable()
+    L.DomEvent.disableScrollPropagation(document.getElementById('login_box'))
+    
+}
+
+function aboutclose() {
+    document.getElementsByClassName('about-box')[0].style.display = "none";
+    document.getElementsByClassName('box')[0].style.display = "block";
+    map.dragging.enable();
+}
+
+
+toplistBox.addEventListener('change', function() {
+    map.setZoom(4);
+    clearMap()
+    fetch(`/${toplistBox.value}`)
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+
+        for(var i = 0; i < data.length; i++) {
+            var obj = data[i];
+            var marker, test;
+            test = obj.id;
+            marker = L.marker([obj.lat, obj.lng], markerOptions).addTo(myFeatureGroup).bindPopup("");
+            marker.test = test;
+            loaded_id.push(obj.id)
+        }
+    });
+})
+
+    
 //document.getElementById('picid').innerHTML = event.layer.test
 
 // ****************************************
@@ -939,13 +879,12 @@ function addfav() {
 // ****************************************
 // ****************************************
 
+
 function addphotosopen() {
     document.getElementsByClassName('add-box')[0].style.display = "block";
     document.getElementsByClassName('box')[0].style.display = "none";
-    uploadbox.style.backgroundColor = "red"
     LoadAddCat()
 }
-
 function addphotosclose() {
     document.getElementsByClassName('add-box')[0].style.display = "none";
     document.getElementsByClassName('box')[0].style.display = "block";
@@ -964,10 +903,23 @@ async function uploadPic() {
     })
     .then(response => response.json())
     .then(data => {
+        // console.log(data)
         sessionStorage.setItem("AddPic", data.image)
+        document.getElementById('cameratext').value = data.camera;
+        document.getElementById('lenstext').value = data.lens;
+        document.getElementById('isotext').value = data.iso;
+        document.getElementById('shuttertext').value = data.shutter
+        document.getElementById('fstoptext').value = data.aperture
         document.getElementById('image').style.backgroundImage = `url(/img/${data.image})`
-        uploadbox.style.backgroundColor = "green";
-        latlng.style.backgroundColor = "red"
+        document.getElementById('lat').innerText = data.gps.lat;
+        document.getElementById('lng').innerText = data.gps.lng;
+        
+        map.panTo(new L.LatLng(data.gps.lat, data.gps.lng));
+        map.setZoom(11)
+        myFeatureGroup.clearLayers();
+        L.marker([data.gps.lat, data.gps.lng], markerOptions).addTo(myFeatureGroup).bindPopup("")
+
+
      });
 }
 
@@ -987,15 +939,6 @@ function saveMapMarker() {
     document.getElementById('footer-btn').style.display = "none"
     document.getElementById('footer-btn').style.display = "none"
     document.getElementsByClassName('add-box')[0].style.display = "block"
-    latlng.style.backgroundColor = "green"
-    title.style.backgroundColor = "red"
-    camera.style.backgroundColor = "red"
-    lens.style.backgroundColor = "red"
-    shutter.style.backgroundColor = "red"
-    iso.style.backgroundColor = "red"
-    fstop.style.backgroundColor = "red"
-    cat.style.backgroundColor = "red"
-    info.style.backgroundColor = "red"
     $('.leaflet-container').css("cursor" , "-webkit-grab");
     setLocation = false
 }
@@ -1009,7 +952,7 @@ async function LoadAddCat() {
       })
       .then(response => response.json())
       .then(data => {
-          console.log(data);
+          //console.log(data);
          for(let i = 0; i < data.length; i++) {
             let obj = data[i]
             select.options[select.options.length] = new Option(obj.category, obj.category);
@@ -1043,7 +986,7 @@ async function SaveImage() {
         username: sessionStorage.getItem('username')
     })
 
-    console.log(data)
+    //console.log(data)
 
     fetch("/picsave", {
         method: 'POST',
@@ -1069,33 +1012,3 @@ function PicLike() {
     }
 }
  
-//  Keyword Tags
-let btn = document.getElementById('btn')
-let key = document.querySelectorAll('.multi-search-item')
-
-function multiSearchKeyup(inputElement) {
-if(event.keyCode === 13) {
-    inputElement.parentNode
-        .insertBefore(createFilterItem(inputElement.value), inputElement);
-    inputElement.value = "";
-}
-function createFilterItem(text) {
-    const item = document.createElement("div");
-    item.setAttribute("class", "multi-search-item");
-    const span = `<span>${text}</span>`;
-    const close = `<div class="fa fa-close" onclick="this.parentNode.remove()"></div>`;
-    item.innerHTML = span+close;
-    return item;
-}
-
-btn.onclick = function() {
-    let key = document.querySelectorAll('.multi-search-item')
-    // console.log(key)
-    
-    for(i=0; i<key.length; i++) {
-        let word = key[i].outerText
-        console.log(word)
-    }
-}
-
-}
