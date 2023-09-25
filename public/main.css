@@ -148,6 +148,7 @@ section .footer {
     backdrop-filter: blur(5px);
     color: #000;
     border-radius: 15px;
+    margin-top: -125vh;
 }
 
 .about-box {
@@ -213,6 +214,319 @@ section .footer {
 .about-footer > button {
     min-width: 250px;
 }
+
+.myaccount-box {
+    display: none;
+    z-index: 1;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    min-width: 80vw;
+    min-height: 80vh;
+    padding: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,1);
+    text-align: center;
+    background: transparent;
+    backdrop-filter: blur(5px);
+    color: #000;
+    background-color: #175f0963;
+    border-radius: 15px;
+    flex-direction: column;
+}
+
+.myaccount-title {
+    font-size: 26px;
+}
+
+
+.account-photo-select {
+    width: 400px;
+}
+
+.photo-name-label {
+    margin-right: 1rem;
+    font-size: 14px;
+}
+
+.account-btn {
+    width: 35vw;
+}
+
+.my-photo-picker {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+
+
+}
+
+.myaccount-photo {
+    float: left;
+    margin-left: 1rem;
+    height: auto;
+    width: 30vw;
+}
+
+.tab1 {
+    display: flex;
+    flex-direction: column;
+}
+
+.my-account-photo-box {
+    display: flex;
+    justify-content: space-around;
+}
+
+.photo-info {
+    display: flex;
+    flex-direction: column;
+    width: 35vw;
+    justify-content: center;
+    align-items: center;
+}
+
+.published {
+   
+}
+
+.my-account-photo-info {
+    display: flex;
+    flex-direction: column;
+    width: 35vw;
+}
+
+.account-camerinfo-div {
+    width: 30vw;
+    height: 40px;
+    margin-top: 10px;
+  
+    /* border: #000 2px solid; */
+}
+
+.account-camerinfo-div:last-child {
+    
+    margin-top: 130px;
+
+}
+
+.account-camerainfo-text {
+    margin-right: 405px;
+    margin-bottom: -1px;
+}
+
+
+.account-camerainfo-textbox {
+    width: 25vw;
+    height: 30px;
+}
+
+.account-camerainfo-textarea {
+    width: 25vw;
+    height: 150px;
+}
+
+
+.social-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #2196F3;
+    padding: 10px;
+    grid-gap: 5px;
+    height: 60vh;
+  }
+  .social-grid-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+    height: 1fr;
+  }
+
+.social-logo {
+    height: 100px;
+    width: auto;
+}
+
+.social-link-box {
+    height: 30px;
+    width: 95%;
+}
+
+.account-grid-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    background-color: #2196F3;
+    padding: 10px;
+    grid-gap: 5px;
+    height: 60vh;
+  }
+  .account-grid-item {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    font-size: 30px;
+    text-align: center;
+    height: 1fr;
+  }
+
+  .account.pic {
+
+    margin-top: -20px;
+    width: 105px;
+    height: 105px;
+    border: green 2px solid;
+    border-radius: 10px;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+
+
+/* highlight colors */
+::-moz-selection {
+  background-color: #333;
+  color: white;
+}
+
+::selection {
+  background-color: #333;
+  color: white;
+}
+
+/* wrapper */
+.wrapper {
+  max-width: 100%;
+  min-height: 100%;
+  padding-right: 10px;
+  padding-left: 10px;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+/* tabs */
+.tabs {
+  border-right: 1px solid #ccc;
+}
+.tabs:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.tabs input[type=radio] {
+  display: none;
+}
+.tabs label {
+  display: block;
+  float: left;
+  width: 33.33333%;
+  padding: 1em;
+  border: 1px solid #ccc;
+  border-right: none;
+  background-color: #f7f7f7;
+  text-align: center;
+  font-weight: 700;
+  color: coral;
+  cursor: pointer;
+  transition: background-color 150ms ease-in-out;
+}
+.tabs label:hover {
+  background-color: white;
+}
+.tabs [id^=tab]:checked + label {
+  border-bottom-color: white;
+  background: white;
+  color: #333;
+}
+
+.tab-content {
+  display: none;
+  float: left;
+  min-width: 78vw;
+  height: 66vh;
+  padding: 1em;
+  border-bottom: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  background-color: white;
+}
+
+#tab1:checked ~ #tab-content1,
+#tab2:checked ~ #tab-content2,
+#tab3:checked ~ #tab-content3 {
+  display: block;
+}
+
+.other-content {
+  color: white;
+}
+
+@media only screen and (max-width: 768px) {
+  body, html {
+    font-size: 18px;
+  }
+}
+@media only screen and (max-width: 645px) {
+  .tabs label {
+    float: none;
+    width: 100%;
+  }
+}
+@media only screen and (max-width: 480px) {
+  body, html {
+    font-size: 16px;
+  }
+}
+
+
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -445,7 +759,7 @@ z-index: 5;
     display: none;
     justify-content: center;
     align-items: center;
-    margin-top: -35px;
+    margin-top: -100vh;
 }
 
 @keyframes photoViewIn {

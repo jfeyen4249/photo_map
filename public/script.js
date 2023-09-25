@@ -76,17 +76,12 @@ window.addEventListener("keydown", function (event) {
   });
 
 
-
-
-
-
-
 // ****************************************
 // ****************************************
 // ****          Map Setup             ****
 // ****************************************
 // ****************************************
-var map = L.map('map').setView([40.463666324587685, -100.32714843749999], 5);
+var map = L.map('map').setView([42.538498, -90.436845], 9);
 mapLink = '<a href="https://openstreetmap.org"></a>'
 L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -427,7 +422,7 @@ function getComments() {
 // ****************************************
 
 // Checking for a User's session 
-if(sessionStorage.getItem('username') == 'guest' && sessionStorage.getItem('token') == null) {
+if(sessionStorage.getItem('username') == 'guest') {
     document.getElementsByClassName('login-box')[0].style.display = "none";
     sessionStorage.setItem('username', 'guest');
     document.getElementsByClassName('box')[0].style.display = "none";
@@ -437,11 +432,11 @@ if(sessionStorage.getItem('username') == 'guest' && sessionStorage.getItem('toke
     fetch(`/myview?user=${sessionStorage.getItem('username')}`)
     .then(response => response.json())
     .then(data => {
-        //console.log(data)
+        console.log(data)
         map.panTo(new L.LatLng(data[0].lat, data[0].lng));
         map.setZoom(data[0].zoom)
-            //map = L.map('map').setView([data[0].lat, data[0].lng], data[0].zoom, draggable = false);
-            map.dragging.enable()
+            
+        map.dragging.enable()
         });  
 
 }else if(sessionStorage.getItem('username') == null && sessionStorage.getItem('token') == null){
@@ -451,6 +446,7 @@ if(sessionStorage.getItem('username') == 'guest' && sessionStorage.getItem('toke
     document.getElementById('login_box').focus()
     map.dragging.disable()
     L.DomEvent.disableScrollPropagation(document.getElementById('login_box'))
+    
 
 } else {
     loadMarkers();
@@ -526,16 +522,6 @@ function commentPost() {
 
     comment_text.value = ''
 }
-
-
-
-
-
-
-
-
-
-
 
 
 // ****************************************
@@ -763,6 +749,8 @@ function disableSearch() {
     document.getElementById('toplist').style.display = "none"
     clearMap()
     map.setZoom(12)
+    map.dragging.enable();
+
 }
 
 // This function show the users the photos that they have marked at their favorite.
@@ -850,6 +838,18 @@ function aboutclose() {
     map.dragging.enable();
 }
 
+function myAccountopen() {
+    document.getElementsByClassName('myaccount-box')[0].style.display = "flex";
+    document.getElementsByClassName('box')[0].style.display = "none";
+    map.dragging.disable()
+    L.DomEvent.disableScrollPropagation(document.getElementById('login_box'))
+}
+
+function myAccountclose() {
+    document.getElementsByClassName('myaccount-box')[0].style.display = "none";
+    document.getElementsByClassName('box')[0].style.display = "block";
+    map.dragging.enable();
+}
 
 toplistBox.addEventListener('change', function() {
     map.setZoom(4);
@@ -885,6 +885,7 @@ function addphotosopen() {
     document.getElementsByClassName('box')[0].style.display = "none";
     LoadAddCat()
 }
+
 function addphotosclose() {
     document.getElementsByClassName('add-box')[0].style.display = "none";
     document.getElementsByClassName('box')[0].style.display = "block";

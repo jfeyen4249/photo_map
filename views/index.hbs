@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>PhotoMap - A photographers guide</title>
+    <title>Map Your Photo - A photographers guide</title>
      <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://fonts.googleapis.com/css?family=Muli&display=swap" rel="stylesheet">
     <script src="/leaflet.js"></script>
@@ -32,8 +32,8 @@
                 <button class="btn" id="myfavs" onclick="myfavs(event);"><i class="fa fa-heart"></i> My Favorites</button>
                 {{!-- <button class="btn" id="search" onclick="mysearch();"><i class="fa fa-search"></i> Search</button> --}}
                 <button class="btn" onclick="toplist();" id="top"><i class="fa fa-list"></i> Top 10</button>
-                <button class="btn" id="about" onclick="aboutopen();"><i class="fa fa-info"></i> About PhotoMap</button>
-                <button class="btn"  id="logout"><i class="fa fa-user"></i> My Account</button>
+                <button class="btn" id="about" onclick="aboutopen();"><i class="fa fa-info"></i> About</button>
+                <button class="btn" onclick="myAccountopen();" id="myaccount"><i class="fa fa-user"></i> My Account</button>
                 <button class="btn" onclick="logout();" id="logout"><i class="fa fa-sign-out"></i> Logout</button>
             </div>
 
@@ -88,17 +88,211 @@
         </div>
 
 
+ <div class="myaccount" id="myaccount" onclick="blockClick(event)">
+            <div class="myaccount-box">
+                <div class="myaccount-title">My Account Manager</div>
 
+               
+                    <div class="wrapper">
+                        <div class="tabs cf">
+                            <input type="radio" name="tabs" class="tab1" id="tab1" checked>
+                            <label for="tab1">
+                            Photo Manager
+                        </label>
+                            <input type="radio" name="tabs" id="tab2">
+                            <label for="tab2">
+                            Social Link Manager
+                        </label>
+                            <input type="radio" name="tabs" id="tab3">
+                            <label for="tab3">
+                            Account Settings
+                        </label>
+
+                            <div id="tab-content1" class="tab-content">
+                               <div class="my-photo-picker">
+                               
+                               <h3 class="photo-name-label">Photo: </h3>
+                               <select name="photoname" class="account-photo-select" id="myphto">
+                                    <option value="">Select A Photo</option>
+                               </select>
+                                </div>
+
+                            <div class="my-account-photo-box">
+                               
+                                <div class="photo-info">
+                                    
+                                    <img class="myaccount-photo" src="./img/c2c928d3c9defe137c81f9138596e653.jpg"></img>
+                                    <button class="btn published"> Publish</button>
+                                </div>
+
+                                <div class="my-account-photo-info">
+                                    
+                                    <center>
+                                    <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">Camera </p>
+                                        <input type="text" class="account-camerainfo-textbox" name="" id="a">
+                                    </div>
+
+                                    <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">Lens</p>
+                                        <input type="text" class="account-camerainfo-textbox" name="" id="a">
+                                    </div>
+
+                                    <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">ISO</p>
+                                        <input type="text" class="account-camerainfo-textbox" name="" id="a">
+                                    </div>
+
+                                    <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">Apature</p>
+                                        <input type="text" class="account-camerainfo-textbox" name="" id="a">
+                                    </div>  
+
+                                    <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">Shutter Speed</p>
+                                        <input type="text" class="account-camerainfo-textbox" name="" id="a">
+                                    </div>
+
+                                     <div class="account-camerinfo-div">
+                                        <p class="account-camerainfo-text">Description</p>
+                                        <textarea name="" id="" class="account-camerainfo-textarea" cols="60" rows="20"></textarea>
+                                    </div>
+
+                                    <div class="account-camerinfo-div">
+                                        <button class="btn">Save</button>
+
+                                    </div>
+
+                                    
+
+                                    </center>
+                                </div>
+
+
+                                </div>
+                            </div>
+
+                            <div id="tab-content2" class="tab-content">
+                                
+                                <center>
+                                    <div class="social-grid-container">
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/fb.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+
+                                    </div>
+
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/in.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/tiktok.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/you.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/twitter.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+                                    <div class="social-grid-item">
+                                        <img src="/img/social/web.png" alt="facebook" class="social-logo" srcset="">
+                                        <br>
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+                                </div>
+
+                                </center>
+                                
+                            </div>
+
+                            <div id="tab-content3" class="tab-content">
+                                <center>
+                                    <div class="account-grid-container">
+                                    <div class="account-grid-item">
+                                        <h5>Change your Profile Picture</h5>
+                                        <br>
+                                        <img src="/img/profile/default.png" alt="" class="account pic">
+                                        <br>
+                                        <button class="btn">Save</button>
+
+                                    </div>
+
+                                    <div class="account-grid-item">
+                                        <h5>Change your Password</h5>
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+
+                                    <div class="account-grid-item">
+                                        <h5>Change your Default Map View</h5>
+                                        
+                                        <input type="text" class="social-link-box">
+                                        <br>
+                                        <button class="btn">Save</button>
+                                    </div>
+                                  
+                                </div>
+
+                                </center>
+                            </div>
+                        </div>
+
+                    </div>       
+
+                        <center><button class="btn account-btn" onclick="myAccountclose();">Close</button></center>
+
+                  </div> 
+            </div>
+        </div>
 
 
 
         <div class="about" id="about_box" onclick="blockClick(event)">
             <div class="about-box">
-                <div class="about-title">About PhotoMap</div>
+                <div class="about-title">Map Your Photos</div>
 
                 <div class="about-body">
                     <img src="./joe.jpg" class="about-joe">
-                    <p class="about-text">t! Repellat nostrum cum iure quisquam quaerat assumenda mollitia similique aliquam hic consectetur accusamus, nam officiis, minus quam harum maiores impedit eos quos quidem consequatur autem accusantium provident facilis? Maiores veniam impedit, adipisci sapiente sint quae amet esse aperiam, in et a nobis, voluptates tempora id repudiandae natus beatae. Voluptatibus accusamus similique hic labore ducimus beatae totam repellat deleniti recusandae, vitae expedita at, architecto aliquid magni nesciunt, voluptas dolores a illo! Aliquam vitae eius mollitia eveniet dolores. Assumenda suscipit deleniti quos excepturi, accusantium laborum adipisci labore ipsa, voluptatem natus dolorum et quae. Odio, ut, porro doloremque maxime ipsum id dolores aut nobis ducimus incidunt in, deleniti perspiciatis corrupti? Enim, explicabo!</p>
+                    <p class="about-text">Map your Photos was an idea I had since 2008, however I did not have the programming skills to build it. Fast forword a few years and an app can Stuck on Earth came out that had a very similar idea. <br><br>
+
+                   Now that I am learning software development and Stuck on Earth is discontinued, I wanted to take a stabe at building it. It is not done, but I am working on more features.</p>
                 </div>
 
                 <div class="about-footer">
@@ -108,12 +302,8 @@
             </div>
         </div>
 
-
-
-
         
-
-
+       
 
         <div class="view-photo"  onclick="blockClick(event)">
             <input id="picid">
@@ -124,8 +314,8 @@
                         
                     <h1 id="pic-title" class="pic-title"></h1>
                         <div class="tabs">
-                                <input type="radio" class="tabs__radio" name="tabs-example" id="tab1" checked>
-                                <label for="tab1" class="tabs__label">Photo Info</label>
+                                <input type="radio" class="tabs__radio" name="tabs-example" id="photoinfo" checked>
+                                <label for="photoinfo" class="tabs__label">Photo Info</label>
                                 <div class="tabs__content" id="view-info">
                                   
                                     <div class="view-camera"> Camera: <span id="camera-body"></span></div>
@@ -191,8 +381,8 @@
                                 </div>
 
 
-                                <input type="radio" class="tabs__radio" name="tabs-example" id="tab2">
-                                <label for="tab2" class="tabs__label">About the Photographer</label>
+                                <input type="radio" class="tabs__radio" name="tabs-example" id="social">
+                                <label for="social" class="tabs__label">About the Photographer</label>
                                 <div class="tabs__content">
                                   
                                     <div class="view-about-photographer">
@@ -211,9 +401,7 @@
                     <div class="tags">
                         <div class="tag-title">Tags:</div>
                         <div class="tag" id="keyword-tag">
-                            <p class="keyword-tags">Winter</p>
-                            <p class="keyword-tags">Winter</p>
-                            <p class="keyword-tags">Winter</p>
+                            
                         </div>
                     </div>
 
@@ -259,41 +447,8 @@
                   </div>
             </div>
         </div>
+
+        
     </div>
-
-<script>
-        let defaultOption = document.querySelector('.defaultOption');
-        
-        let sbtn = document.getElementById('search')
-        let searchbox = document.getElementById('searchbox')
-        let searchbtn = document.getElementById('searchbtn')
-        let ul = document.querySelector('.ul');
-        
-        function search()  {
-            console.log(searchbox.value)
-            fetch(`/find?type=username&search=${searchbox.value}`)
-  		    .then(response => response.json())
-  		    .then(data => {
-			  for(let i = 0; i < data.length; i++) {
-            	let obj = data[i]
-                console.log(obj.user)
-         }  
-	   });
-        }
-       
-        defaultOption.onclick = function() {
-            ul.classList.toggle("active")
-         }
-
-         function selectOption(listitem) {
-            let value = listitem.innerHTML
-            defaultOption.innerHTML = value
-           // <i class="fa-solid fa-user-magnifying-glass"></i>
-            ul.classList.toggle("active")
-         }
-
-    </script>
-    
-
 </body>
 </html>

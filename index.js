@@ -88,6 +88,12 @@ app.get('/search', (req, res) => {
 
 
 
+app.post('/speed', (req, res) => {
+  var bytes = req.body.speed * 1024 * 1024;
+  var megabytes = (bytes / (1024 * 1024)).toFixed(2);
+  console.log('Bytes: ' + req.body.speed + ' || ' + megabytes);
+})
+
 
 
 
