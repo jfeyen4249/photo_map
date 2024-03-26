@@ -15,7 +15,7 @@
     "dotenv": "^11.0.0",
     "exif": "^0.6.0",
     "exifr": "^7.1.3",
-    "express": "^4.17.1",
+    "express": "^4.19.2",
     "express-handlebars": "^6.0.2",
     "fractional": "^1.0.0",
     "fractions": "^1.0.2",
